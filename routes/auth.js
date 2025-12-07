@@ -10,7 +10,7 @@ router.get("/register", (req, res) => {
 });
 
 router.post("/register", async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, type } = req.body;
 
     const errors = [];
     if (!username) errors.push("Username is needed");
@@ -25,7 +25,7 @@ router.post("/register", async (req, res) => {
 
     const hash = await bcrypt.hash(password, 10);
 
-    await User.create({ username, password: hash });
+    await User.create({ username, password: hash, type });
 
     res.redirect("/login");
 });

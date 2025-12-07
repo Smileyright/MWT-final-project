@@ -11,6 +11,7 @@ router.get("/", async (req, res) => {
 //Add
 router.get("/add", (req, res) => {
     if (!req.session.user) return res.redirect("/login");
+    if (req.session.user.type !== 'admin') return res.status(403).send("Access denied");
 
     res.render("movies/add", { errors: [], old: {}, currentUser: req.session.user  });
 });
@@ -53,7 +54,7 @@ router.get("/:id", async (req, res) => {
 });
 
 //Edit
-router.get("/:id/edit", async (req, res) => {
+router.get("/edit/:id", async (req, res) => {
     if (!req.session.user) return res.redirect("/login");
 
     const movie = await Movie.findById(req.params.id);
@@ -63,7 +64,7 @@ router.get("/:id/edit", async (req, res) => {
 });
 
 //Post
-router.post("/:id/edit", async (req, res) => {
+router.post("/edit/:id", async (req, res) => {
     if (!req.session.user) return res.redirect("/login");
 
     const movie = await Movie.findById(req.params.id);
@@ -91,7 +92,7 @@ router.post("/:id/edit", async (req, res) => {
 });
 
 //Delete
-router.post("/:id/delete", async (req, res) => {
+router.post("/delete/:id", async (req, res) => {
     if (!req.session.user) return res.redirect("/login");
 
     const movie = await Movie.findById(req.params.id);
