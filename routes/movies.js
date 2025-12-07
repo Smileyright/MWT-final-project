@@ -56,6 +56,7 @@ router.get("/:id", async (req, res) => {
 //Edit
 router.get("/edit/:id", async (req, res) => {
     if (!req.session.user) return res.redirect("/login");
+    if (req.session.user.type !== 'admin') return res.status(403).send("Access denied");
 
     const movie = await Movie.findById(req.params.id);
     if (!movie) return res.status(404).send("Movie not found");
@@ -94,6 +95,7 @@ router.post("/edit/:id", async (req, res) => {
 //Delete
 router.post("/delete/:id", async (req, res) => {
     if (!req.session.user) return res.redirect("/login");
+    if (req.session.user.type !== 'admin') return res.status(403).send("Access denied");
 
     const movie = await Movie.findById(req.params.id);
     if (!movie) return res.status(404).send("Movie not found");
