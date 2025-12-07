@@ -1,0 +1,36 @@
+<%- include('../partials/header', {title: 'Movies'}) %>
+<h1>Add New Movie</h1>
+<div class="form-container">
+    <form action="/add" method="post">
+         <div>
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+        <div>
+            <label for="description">Description:</label>
+            <input type="text" id="description" name="description" required>
+        </div>
+
+        <div>
+            <label for="year">Year:</label>
+            <input type="text" id="year" name="year" required>
+        </div>
+
+        <div>
+            <p>Rating: </p>>
+            <label for="1star">1 Star</label>
+            <input type="radio" id="1star" name="rating" value="1" required>
+            <label for="2star">2 Stars</label>
+            <input type="radio" id="2star" name="rating" value="2" required>
+            <label for="3star">3 Stars</label>
+            <input type="radio" id="3star" name="rating" value="3" required>
+            <label for="4star">4 Stars</label>
+            <input type="radio" id="4star" name="rating" value="4" required>
+            <label for="5star">5 Stars</label>
+            <input type="radio" id="5star" name="rating" value="5" required>
+        </div>
+
+        <button type="submit" class="submit-btn">Add Student</button>
+    </form>
+</div>
+<%- include('../partials/footer') %>

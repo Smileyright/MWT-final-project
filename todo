@@ -1,0 +1,14 @@
+- Create new Express app with EJS templates DONE
+- Create Mongoose connection and Movie model with attributes for name, description, year, genres, rating. You are allowed to add one more field of your choice DONE
+- Create router to store routes in movies.js DONE
+- Create form to collect data for movie and render errors
+- Create route for add movie, validate user input, and returns errors DONE?
+- Create route with param of id and form to display movie details PART
+- Create route with params f id and form to edit movie details PART
+- Create route and form with error validation for registration PART
+- Create route and form with error validation for login PART
+- Create route for logout DONE
+- Restrcit access to add movie to logged in users
+- Restrict access to edit/delete movie to users who posted/added movie
+- Deploy application to Heroku(other) and submit all details, code, browser screenshot in blackboard
+- Choose the design/layout of your choice

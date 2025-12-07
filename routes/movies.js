@@ -25,6 +25,7 @@ router.post("/add", async (req, res) => {
     if (!description) errors.push("Description is needed");
     if (!year) errors.push("Year is needed");
     if (!rating) errors.push("Rating is needed");
+    if (!genres) errors.push("At least one genre is needed");
 
     if (errors.length > 0) {
         return res.render("movies/add", { errors, old: req.body });
