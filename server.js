@@ -12,6 +12,9 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json())
 app.use(express.urlencoded({ extended: true} ));
 
+const movieRoute = require('./routes/movies');
+const authRoute = require('./routes/auth');
+
 const testDB = async() => {
     try {
         const movieToInsert = Movie({
@@ -47,6 +50,11 @@ const connectDB = async() => {
         
     }
 }
+
+
+app.use("/", authRoute);
+app.use("/movies", movieRoute);
+
 
 const onServerStart = () => {
     console.log(`The server started running at http://localhost:${PORT}`);
