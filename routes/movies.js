@@ -5,14 +5,14 @@ const Movie = require("../models/movie");
 //List
 router.get("/", async (req, res) => {
     const movies = await Movie.find();
-    res.render("movies/index", { movies });
+    res.render("movies/index", { movies, currentUser: req.session.user });
 });
 
 //Add
 router.get("/add", (req, res) => {
     if (!req.session.user) return res.redirect("/login");
 
-    res.render("movies/add", { errors: [], old: {} });
+    res.render("movies/add", { errors: [], old: {}, currentUser: req.session.user  });
 });
 
 router.post("/add", async (req, res) => {
@@ -28,9 +28,9 @@ router.post("/add", async (req, res) => {
     if (!genres) errors.push("At least one genre is needed");
 
     if (errors.length > 0) {
-        return res.render("movies/add", { errors, old: req.body });
+        return res.render("movies/add", { errors, old: req.body, currentUser: req.session.user  });
     }
-
+//TODO: check user type before allowing add
     await Movie.create({
         title,
         description,
@@ -49,7 +49,7 @@ router.get("/:id", async (req, res) => {
 
     if (!movie) return res.status(404).send("Movie not found");
 
-    res.render("movies/detail", { movie });
+    res.render("movies/detail", { movie, currentUser: req.session.user  });
 });
 
 //Edit
@@ -59,7 +59,7 @@ router.get("/:id/edit", async (req, res) => {
     const movie = await Movie.findById(req.params.id);
     if (!movie) return res.status(404).send("Movie not found");
 
-    res.render("movies/edit", { movie, errors: [] });
+    res.render("movies/edit", { movie, errors: [], currentUser: req.session.user  });
 });
 
 //Post
@@ -76,7 +76,7 @@ router.post("/:id/edit", async (req, res) => {
     if (!year) errors.push("Year needed");
 
     if (errors.length > 0) {
-        return res.render("movies/edit", { movie, errors });
+        return res.render("movies/edit", { movie, errors, currentUser: req.session.user  });
     }
 
     await Movie.findByIdAndUpdate(req.params.id, {

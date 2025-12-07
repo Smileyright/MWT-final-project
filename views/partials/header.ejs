@@ -8,10 +8,20 @@
 </head>
 <body>
     <header>
-        <h1></h1>
+        <h1>Movie List Site</h1>
         <nav>
             <ul>
                 <li>Test nav</li>
             </ul>
         </nav>
+        <div id="userInfo">
+            <% if (currentUser) { %>
+                <p>Logged in as: <%= currentUser.username %> (<%= currentUser.type %>)</p>
+                <form action="/logout" method="POST" style="display:inline;">
+                    <button type="submit">Logout</button>
+                </form>
+            <% } else { %>
+                <a href="/login">Login</a> | <a href="/register">Register</a>
+            <% } %>
+        </div>
     </header>

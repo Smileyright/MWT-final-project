@@ -6,7 +6,7 @@ const User = require("../models/User");
 
 //Register form
 router.get("/register", (req, res) => {
-    res.render("auth/register", { errors: [], old: {} });
+    res.render("auth/register", { errors: [], old: {}, currentUser: req.session.user  });
 });
 
 router.post("/register", async (req, res) => {
@@ -20,7 +20,7 @@ router.post("/register", async (req, res) => {
     if (exists) errors.push("Username already exists");
 
     if (errors.length > 0) {
-        return res.render("auth/register", { errors, old: req.body });
+        return res.render("auth/register", { errors, old: req.body, currentUser: req.session.user  });
     }
 
     const hash = await bcrypt.hash(password, 10);
@@ -32,7 +32,7 @@ router.post("/register", async (req, res) => {
 
 //Login
 router.get("/login", (req, res) => {
-    res.render("auth/login", { errors: [] });
+    res.render("auth/login", { errors: [], currentUser: req.session.user  });
 });
 
 router.post("/login", async (req, res) => {
@@ -41,12 +41,12 @@ router.post("/login", async (req, res) => {
     const user = await User.findOne({ username });
 
     if (!user)
-        return res.render("auth/login", { errors: ["Invalid username or password"] });
+        return res.render("auth/login", { errors: ["Invalid username or password"], currentUser: req.session.user  });
 
     const match = await bcrypt.compare(password, user.password);
 
     if (!match)
-        return res.render("auth/login", { errors: ["Invalid username or password"] });
+        return res.render("auth/login", { errors: ["Invalid username or password"], currentUser: req.session.user  });
 
     req.session.user = user;
 
@@ -54,7 +54,7 @@ router.post("/login", async (req, res) => {
 });
 
 //Logout
-router.get("/logout", (req, res) => {
+router.post("/logout", (req, res) => {
     req.session.destroy(() => {
         res.redirect("/login");
     });
