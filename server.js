@@ -3,6 +3,7 @@ const app = express();
 const mongoose = require('mongoose');
 const Movie = require('./models/movie');
 const path = require('path');
+const session = require('express-session');
 const PORT = process.env.PORT || 8000
 const CONNECTION_STRING = `mongodb+srv://dbUser:dbUserPassword@cluster0.nyug8pi.mongodb.net/FinalProject`
 
@@ -12,27 +13,18 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json())
 app.use(express.urlencoded({ extended: true} ));
 
+app.use(session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: true,
+    user: null
+}));
+
 const movieRoute = require('./routes/movies');
 const authRoute = require('./routes/auth');
 
-const testDB = async() => {
-    try {
-        const movieToInsert = Movie({
-            _id: new mongoose.Types.ObjectId(),
-            title: "Inception",
-            director: "Christopher Nolan",
-            year: 2010,
-            genres: ["Sci-Fi", "Thriller"],
-            rating: 8.8
-        });
-        console.log(movieToInsert);
-        await movieToInsert.save();
-        const movies = await Movie.find();
-        console.log(movies);
-    }   catch(e)    {
-        console.log(e); 
-    }
-}
+app.use("/", authRoute);
+app.use("/movies", movieRoute);
 
 const connectDB = async() => {
     try{
@@ -50,11 +42,6 @@ const connectDB = async() => {
         
     }
 }
-
-
-app.use("/", authRoute);
-app.use("/movies", movieRoute);
-
 
 const onServerStart = () => {
     console.log(`The server started running at http://localhost:${PORT}`);
