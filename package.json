@@ -22,11 +22,13 @@
   "homepage": "https://github.com/Smileyright/MWT-final-project#readme",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "dotenv": "^17.2.3",
     "ejs": "^3.1.10",
     "express": "^5.2.1",
     "express-session": "^1.18.2",
     "mongoose": "^9.0.0",
     "nodemon": "^3.1.11",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "serverless-http": "^4.0.0"
   }
 }
