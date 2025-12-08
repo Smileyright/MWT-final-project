@@ -27,7 +27,7 @@ router.post("/register", async (req, res) => {
 
     await User.create({ username, password: hash, type });
 
-    res.redirect("/login");
+    res.redirect("/");
 });
 
 //Login
