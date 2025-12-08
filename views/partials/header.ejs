@@ -12,7 +12,9 @@
         <nav>
             <ul>
                 <li><a href="/movies">Movie List</a></li>
+                <% if (currentUser && currentUser.type === 'admin') { %>
                 <li><a href="/movies/add">Add Movie</a></li>
+                <% } %>
             </ul>
         </nav>
         <div id="userInfo">
