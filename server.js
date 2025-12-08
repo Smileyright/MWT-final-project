@@ -5,7 +5,9 @@ const Movie = require('./models/movie');
 const path = require('path');
 const session = require('express-session');
 const PORT = process.env.PORT || 8000
-const CONNECTION_STRING = `mongodb+srv://dbUser:dbUserPassword@cluster0.nyug8pi.mongodb.net/FinalProject`
+// Swap between local and cloud MongoDB connection strings
+// const CONNECTION_STRING = `mongodb+srv://dbUser:dbUserPassword@cluster0.nyug8pi.mongodb.net/FinalProject`
+const CONNECTION_STRING="mongodb+srv://Vercel-Admin-atlas-rose-island:2rpyezkrsybAJrBA@atlas-rose-island.cdhzifu.mongodb.net/?retryWrites=true&w=majority"
 
 
 app.set("view engine", "ejs");
@@ -31,8 +33,7 @@ const connectDB = async() => {
     try{
         console.log(`Attempting to connect to DB`);
 
-        // await mongoose.connect(CONNECTION_STRING)
-        await mongoose.connect(process.env.MONGODB_URI || CONNECTION_STRING)
+        await mongoose.connect(CONNECTION_STRING)
         .then(() => {
             console.log(`Database connection established successfully.`)},
             // testDB()
