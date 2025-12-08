@@ -16,6 +16,11 @@
                             <td><%= movie.year %></td>
                             <% if (currentUser && currentUser.type === 'admin') { %>
                             <td>
+                                <form action="/movies/<%=movie.id %>" method="get">
+                                    <button type="submit" class="view-btn">View</button>
+                                </form>
+                            </td>
+                            <td>
                                 <form action="/movies/edit/<%=movie.id %>" method="get">
                                     <button type="submit" class="update-btn">Edit</button>
                                 </form>

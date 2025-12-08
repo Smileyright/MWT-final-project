@@ -2,7 +2,8 @@
 
 <h2>Login</h2>
 
-<% if (errors && errors.length > 0) { %>
+<div  class="form-container">
+    <% if (errors && errors.length > 0) { %>
     <ul class="errors">
         <% errors.forEach(e => { %>
             <li><%= e %></li>
@@ -11,13 +12,14 @@
 <% } %>
 
 <form action="/login" method="POST">
-    <label>Username:</label>
+    <label for="username">Username:</label>
     <input type="text" name="username" value="<%= (typeof old !== 'undefined' && old.username) ? old.username : '' %>">
-
-    <label>Password:</label>
+    <br>
+    <label for="password">Password:</label>
     <input type="password" name="password">
-
-    <button type="submit">Login</button>
+    <br>
+    <button type="submit" class="submit-btn">Login</button>
 </form>
+</div>
 
 <%- include("../partials/footer") %>

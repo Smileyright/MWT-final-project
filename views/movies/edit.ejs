@@ -2,6 +2,7 @@
 
 <h2>Edit Movie</h2>
 
+<div class="form-container">
 <% if (errors && errors.length > 0) { %>
     <ul class="errors">
         <% errors.forEach(e => { %>
@@ -30,4 +31,5 @@
     <button type="submit">Save Changes</button>
 
 </form>
+</div>
 <%- include('../partials/footer') %>

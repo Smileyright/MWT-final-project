@@ -23,8 +23,11 @@ router.post("/add", async (req, res) => {
     const errors = [];
 
     if (!title) errors.push("Title is needed");
+    if (title.length < 2) errors.push("Title must be at least 2 characters long");
+    if (title.length > 50) errors.push("Title must be less than 50 characters long");
     if (!description) errors.push("Description is needed");
     if (!year) errors.push("Year is needed");
+    if (!year || isNaN(year)) errors.push("Year must be a number");
     if (!rating) errors.push("Rating is needed");
     if (!genres) errors.push("At least one genre is needed");
 
