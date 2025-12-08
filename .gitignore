@@ -1,2 +1,29 @@
 # Node dependencies
 node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build / Output
+dist/
+build/
+coverage/
+
+# Optional package manager files
+package-lock.json
+yarn.lock
+
+# IDE files
+.vscode/
+.idea/
+.vercel
+.env*.local
