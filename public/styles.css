@@ -168,6 +168,15 @@ th, td {
     background: #f0f8ff;
 }
 
+.movie-list-title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.movie-list-title a:hover {
+    color: #0077ff;
+}
+
 /* Buttons inside table */
 .update-btn,
 .delete-btn,
@@ -215,4 +224,62 @@ footer {
     padding: 15px;
     background: #222;
     color: white;
+}
+
+
+
+/* -----------------------------
+    MOVIE DETAILS PAGE
+------------------------------ */
+.details-container {
+    width: 70%;
+    margin: auto;
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+.details-title {
+    margin-bottom: 20px;
+    color: #0077ff;
+}
+
+.details-container p {
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+}
+
+.details-container strong {
+    color: #333;
+}
+
+/* -----------------------------
+    STAR RATING INPUT
+------------------------------ */
+.rating-container {
+    margin-bottom: 20px;
+}
+
+.star-rating {
+    direction: rtl;  /* flip elements to allow hover fill effect */
+    display: inline-flex;
+}
+
+.star-rating input {
+    display: none;
+}
+
+.star-rating label {
+    font-size: 30px;
+    color: #ccc;                    /* empty star color */
+    cursor: pointer;
+    padding: 0 5px;
+    transition: color 0.2s;
+}
+
+.star-rating input:checked ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: gold;                    /* filled star color */
 }

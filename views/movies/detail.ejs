@@ -1,0 +1,12 @@
+<%- include('../partials/header', {title: 'Movies', currentUser: currentUser}) %>
+
+<div class="details-container">
+    <h2 class="details-title"><%= movie.title %></h2>
+
+    <p><strong>Description:</strong> <%= movie.description %></p>
+    <p><strong>Year Released:</strong> <%= movie.year %></p>
+    <p><strong>Genres:</strong> <%= movie.genres.join(', ') %></p>
+    <p><strong>Rating:</strong> <%= movie.rating %> stars</p>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,8 +1,8 @@
-<%- include('../partials/header', {title: 'Movies'}) %>
+<%- include('../partials/header', {title: 'Movies', currentUser: currentUser}) %>
 
 <h2>Edit Movie</h2>
 
-<% if (errors.length > 0) { %>
+<% if (errors && errors.length > 0) { %>
     <ul class="errors">
         <% errors.forEach(e => { %>
             <li><%= e %></li>
@@ -10,19 +10,19 @@
     </ul>
 <% } %>
 
-<form action="/movies/<%= movie._id %>/edit" method="POST">
+<form action="/movies/edit/<%= movie._id %>" method="POST">
 
     <label>Title:</label>
     <input type="text" name="title" value="<%= movie.title %>">
 
     <label>Description:</label>
-    <input type="text" name="description"><%= movie.description %></input>
+    <input type="text" name="description" value="<%= movie.description %>">
 
     <label>Year:</label>
     <input type="number" name="year" value="<%= movie.year %>">
 
     <label>Genres (comma separated):</label>
-    <input type="text" name="genres" value="<%= movie.genres.join(", ") %>">
+    <input type="text" name="genres" value="<%= movie.genres ? movie.genres.join(', ') : '' %>">
 
     <label>Rating:</label>
     <input type="number" name="rating" step="0.1" value="<%= movie.rating %>">
@@ -30,3 +30,4 @@
     <button type="submit">Save Changes</button>
 
 </form>
+<%- include('../partials/footer') %>
