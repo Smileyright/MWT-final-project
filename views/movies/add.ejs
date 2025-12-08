@@ -28,7 +28,7 @@
     <p>Rating:</p>
 
     <div class="star-rating">
-        <% for (let i = 5; i >= 1; i--) { %>
+        <% for (var i = 5; i >= 1; i--) { %>
             <input type="radio" id="star<%= i %>" name="rating" value="<%= i %>"
                 <%= old && old.rating == i ? 'checked' : '' %> required>
             <label for="star<%= i %>" title="<%= i %> stars">★</label>
