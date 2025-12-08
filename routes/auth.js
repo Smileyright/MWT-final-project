@@ -31,7 +31,7 @@ router.post("/register", async (req, res) => {
 });
 
 //Login
-router.get("/login", (req, res) => {
+router.get("", (req, res) => {
     res.render("auth/login", { errors: [], currentUser: req.session.user  });
 });
 
@@ -56,7 +56,7 @@ router.post("/login", async (req, res) => {
 //Logout
 router.post("/logout", (req, res) => {
     req.session.destroy(() => {
-        res.redirect("/login");
+        res.redirect("/");
     });
 });
 

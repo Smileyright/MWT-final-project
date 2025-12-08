@@ -10,14 +10,14 @@ router.get("/", async (req, res) => {
 
 //Add
 router.get("/add", (req, res) => {
-    if (!req.session.user) return res.redirect("/login");
+    if (!req.session.user) return res.redirect("/");
     if (req.session.user.type !== 'admin') return res.status(403).send("Access denied");
 
     res.render("movies/add", { errors: [], old: {}, currentUser: req.session.user  });
 });
 
 router.post("/add", async (req, res) => {
-    if (!req.session.user) return res.redirect("/login");
+    if (!req.session.user) return res.redirect("/");
 
     const { title, description, year, genres, rating } = req.body;
     const errors = [];
@@ -55,7 +55,7 @@ router.get("/:id", async (req, res) => {
 
 //Edit
 router.get("/edit/:id", async (req, res) => {
-    if (!req.session.user) return res.redirect("/login");
+    if (!req.session.user) return res.redirect("/");
     if (req.session.user.type !== 'admin') return res.status(403).send("Access denied");
 
     const movie = await Movie.findById(req.params.id);
@@ -66,7 +66,7 @@ router.get("/edit/:id", async (req, res) => {
 
 //Post
 router.post("/edit/:id", async (req, res) => {
-    if (!req.session.user) return res.redirect("/login");
+    if (!req.session.user) return res.redirect("/");
 
     const movie = await Movie.findById(req.params.id);
     if (!movie) return res.status(404).send("Movie not found");
@@ -102,6 +102,10 @@ router.post("/delete/:id", async (req, res) => {
 
     await Movie.findByIdAndDelete(req.params.id);
 
+    res.redirect("/movies");
+});
+
+router.get("/delete/:id", async (req, res) => {
     res.redirect("/movies");
 });
 
