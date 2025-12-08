@@ -25,5 +25,3 @@ yarn.lock
 # IDE files
 .vscode/
 .idea/
-.vercel
-.env*.local
