@@ -164,7 +164,7 @@ th, td {
     text-align: left;
 }
 
-tr:hover {
+.table-row:hover {
     background: #f0f8ff;
 }
 
