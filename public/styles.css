@@ -178,6 +178,7 @@ th, td {
 }
 
 /* Buttons inside table */
+.view-btn,
 .update-btn,
 .delete-btn,
 .add-movie-btn {
@@ -186,6 +187,11 @@ th, td {
     border-radius: 6px;
     cursor: pointer;
     font-weight: bold;
+}
+
+.view-btn {
+    background: #0077ff;
+    color: white;
 }
 
 .update-btn {
