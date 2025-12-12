@@ -1,7 +1,7 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 const Movie = require('../models/movie');
-const User = require('../models/User');
+const User = require('../models/user');
 
 // Small helper to ensure the URI has a database name. If not, append 'FinalProject'.
 function ensureDbName(uri) {

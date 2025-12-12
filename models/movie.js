@@ -6,7 +6,7 @@ const movieSchema = new mongoose.Schema({
         required: true
     },
     description: {
-        type: String, 
+        type: String,
         required: true
     },
     year: {
@@ -20,8 +20,7 @@ const movieSchema = new mongoose.Schema({
     rating: {
         type: Number,
         required: true
-    }
-    ,
+    },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

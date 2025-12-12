@@ -1,7 +1,7 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 const Movie = require('../models/movie');
-const User = require('../models/User');
+const User = require('../models/user');
 
 async function run() {
   const userId = process.argv[2];
