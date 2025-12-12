@@ -1,49 +1,13 @@
 <%- include('partials/header', { title: 'Welcome to MovieWatch' }) %>
 
 <main>
-  <div style="text-align:center;padding:2rem 0;">
+  <div style="text-align:center;padding:4rem 0;">
     <h1>Welcome to MovieWatch</h1>
-    <p class="muted">Discover, save and review your favorite movies.</p>
+    <div style="margin-top:3rem;">
+      <a href="/login"><button style="margin:0 1rem; padding:0.75rem 2rem; font-size:1.1rem;">Login</button></a>
+      <a href="/register"><button style="margin:0 1rem; padding:0.75rem 2rem; font-size:1.1rem;">Register</button></a>
+    </div>
   </div>
-
-  <% 
-    // Ensure genres is always defined
-    if (typeof genres === 'undefined') genres = [];
-  %>
-  <% if (genres && Array.isArray(genres) && genres.length > 0) { %>
-    <div class="genres-bar" style="margin:1rem 0;padding:0 1rem;">
-      <strong>Browse by Genre:</strong>
-      <% genres.forEach(function(g){ %>
-        <a href="/movies/genre/<%= encodeURIComponent(g) %>" class="chip"><%= g %></a>
-      <% }) %>
-      <a href="/movies" class="chip" style="background-color: #64748b;">View All Movies</a>
-    </div>
-  <% } %>
-
-  <% 
-    // Ensure movies is always defined
-    if (typeof movies === 'undefined') movies = [];
-  %>
-  <% if (!movies || !Array.isArray(movies) || movies.length === 0) { %>
-    <div style="text-align:center;padding:3rem 0;">
-      <p class="muted">No movies available yet. <a href="/movies/add">Add your first movie</a> to get started!</p>
-    </div>
-  <% } else { %>
-    <h2 style="margin-top:2rem;margin-bottom:1rem;">Featured Movies</h2>
-    <div class="card-grid">
-      <% movies.forEach(function(movie){ %>
-        <div class="card">
-          <h3><a href="/movies/<%= movie._id %>"><%= movie.title %></a></h3>
-          <p class="muted">Year: <%= movie.year %></p>
-          <p><%= movie.description ? movie.description.substring(0,120) : '' %><% if (movie.description && movie.description.length > 120) { %>...<% } %></p>
-          <p class="muted">Genres: <%= movie.genres ? movie.genres.join(', ') : '—' %></p>
-        </div>
-      <% }) %>
-    </div>
-    <div style="text-align:center;margin-top:2rem;">
-      <a href="/movies"><button>View All Movies</button></a>
-    </div>
-  <% } %>
 </main>
 
 <%- include('partials/footer') %>

@@ -118,49 +118,23 @@ app.use(async (req, res, next) => {
     next();
 });
 
-// Render a homepage with movies (after DB connection middleware)
+// Render homepage - show My Movies if logged in, otherwise show welcome page
 app.get('/', async (req, res) => {
-    // Initialize with defaults
-    let movies = [];
-    let genres = [];
-    
-    try {
-        // Ensure database is connected
-        if (mongoose.connection.readyState === 0) {
-            try {
-                await connectDB();
-            } catch (dbErr) {
-                console.error('Database connection failed:', dbErr.message);
-            }
+    // If user is logged in, show their movies (same as /movies/mine)
+    if (req.session && req.session.user) {
+        try {
+            const myId = req.session.user._id;
+            const movies = await Movie.find({ userId: myId }).sort({ _id: -1 });
+            return res.render('movies/mine', { movies });
+        } catch (e) {
+            console.error('Failed to load user movies', e && e.message ? e.message : e);
+            return res.render('movies/mine', { movies: [] });
         }
-        
-        // Only query if database is connected
-        if (mongoose.connection.readyState === 1) {
-            try {
-                // Load distinct genres
-                const genreList = await Movie.distinct('genres');
-                genres = Array.isArray(genreList) ? genreList.sort() : [];
-                
-                // Show all movies
-                const movieList = await Movie.find().sort({ _id: -1 }).limit(12);
-                movies = Array.isArray(movieList) ? movieList : [];
-            } catch (e) {
-                console.error('Failed to load movies for homepage:', e && e.message ? e.message : e);
-                movies = [];
-                genres = [];
-            }
-        }
-    } catch (error) {
-        console.error('Homepage route error:', error);
-        movies = [];
-        genres = [];
     }
     
-    // Always render with defined variables
+    // If not logged in, show welcome page with Login/Register buttons
     return res.render('index', { 
-        title: 'Welcome to MovieWatch',
-        movies: movies,
-        genres: genres
+        title: 'Welcome to MovieWatch'
     });
 });
 
