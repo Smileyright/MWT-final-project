@@ -1,0 +1,21 @@
+<%- include('../partials/header', {title: movie.title}) %>
+
+<main>
+  <h2><%= movie.title %></h2>
+  <p class="muted">Year: <%= movie.year %> • Rating: <%= movie.rating %></p>
+  <p><%= movie.description %></p>
+  <p class="muted">Genres: <%= movie.genres ? movie.genres.join(', ') : '—' %></p>
+
+  <% if (isOwner) { %>
+    <div style="margin-top:1rem;display:flex;gap:.5rem">
+      <a href="/movies/<%= movie._id %>/edit"><button>Edit</button></a>
+      <form action="/movies/<%= movie._id %>/delete" method="post" style="display:inline">
+        <button type="submit" class="secondary">Delete</button>
+      </form>
+    </div>
+  <% } %>
+
+  <p style="margin-top:1rem"><a href="/movies">Back to list</a></p>
+</main>
+
+<%- include('../partials/footer') %>

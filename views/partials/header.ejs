@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> <%= title %> </title>
+    <link rel="stylesheet" href="/styles.css" >
+</head>
+<body>
+    <header>
+        <div class="container">
+                        <% if (currentUser && (currentUser.name || currentUser.username)) { %>
+                            <h1><a href="/">Hello <%= currentUser.name ? currentUser.name : currentUser.username %></a></h1>
+                        <% } else { %>
+                            <h1><a href="/">MovieWatch</a></h1>
+                        <% } %>
+                <nav>
+                        <ul>
+                            <li><a href="/">Home</a></li>
+                            <li><a href="/movies">Movies</a></li>
+                                        <% if (!currentUser) { %>
+                                            <li><a href="/register">Register</a></li>
+                                            <li><a href="/login">Login</a></li>
+                                        <% } else { %>
+                                            <li><a href="/movies/mine">My Movies</a></li>
+                                            <li><a href="/logout">Logout</a></li>
+                                        <% } %>
+                        </ul>
+                </nav>
+        </div>
+    </header>
+    <div class="container">

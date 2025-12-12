@@ -1,0 +1,33 @@
+<%- include('../partials/header', {title: 'Movies'}) %>
+
+<main>
+	<h2>Movies</h2>
+
+
+
+	<% if (genres && genres.length > 0) { %>
+		<div class="genres-bar" style="margin:1rem 0;padding:0 1rem;">
+			<strong>Genres:</strong>
+			<% genres.forEach(function(g){ %>
+				<a href="/movies/genre/<%= encodeURIComponent(g) %>" class="chip"><%= g %></a>
+			<% }) %>
+		</div>
+	<% } %>
+
+	<% if (!movies || movies.length === 0) { %>
+		<p class="muted">No movies found. Try adding one.</p>
+	<% } else { %>
+		<div class="card-grid">
+			<% movies.forEach(function(movie){ %>
+				<div class="card">
+					<h3><a href="/movies/<%= movie._id %>"><%= movie.title %></a></h3>
+					<p class="muted">Year: <%= movie.year %> • Rating: <%= movie.rating %></p>
+					<p><%= movie.description ? movie.description.substring(0,120) : '' %>...</p>
+					<p class="muted">Genres: <%= movie.genres ? movie.genres.join(', ') : '—' %></p>
+				</div>
+			<% }) %>
+		</div>
+	<% } %>
+</main>
+
+<%- include('../partials/footer') %>

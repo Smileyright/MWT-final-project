@@ -1,0 +1,28 @@
+<%- include('../partials/header', {title: 'My Movies'}) %>
+
+<main>
+	<h2>My Movies</h2>
+
+	<% if (!movies || movies.length === 0) { %>
+		<p class="muted">You haven't added any movies yet. <a href="/movies/add">Add your first movie</a>.</p>
+	<% } else { %>
+		<div class="card-grid">
+			<% movies.forEach(function(movie){ %>
+				<div class="card">
+					<h3><a href="/movies/<%= movie._id %>"><%= movie.title %></a></h3>
+					<p class="muted">Year: <%= movie.year %> • Rating: <%= movie.rating %></p>
+					<p><%= movie.description ? movie.description.substring(0,120) : '' %>...</p>
+					<p class="muted">Genres: <%= movie.genres ? movie.genres.join(', ') : '—' %></p>
+					<div style="margin-top:.5rem;">
+						<a href="/movies/<%= movie._id %>/edit"><button> Edit </button></a>
+						<form action="/movies/<%= movie._id %>/delete" method="post" style="display:inline;">
+							<button onclick="return confirm('Delete this movie?')" class="secondary">Delete</button>
+						</form>
+					</div>
+				</div>
+			<% }) %>
+		</div>
+	<% } %>
+</main>
+
+<%- include('../partials/footer') %>

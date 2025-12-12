@@ -1,0 +1,29 @@
+<%- include('../partials/header', { title: 'Login' }) %>
+
+<main>
+  <h2>Login</h2>
+
+  <% if (errors && errors.length) { %>
+    <ul style="color: red;">
+      <% errors.forEach(function(err){ %>
+        <li><%= err %></li>
+      <% }) %>
+    </ul>
+  <% } %>
+
+  <form action="/login" method="post">
+    <div>
+      <label for="username">Username</label>
+      <input id="username" name="username" />
+    </div>
+    <div>
+      <label for="password">Password</label>
+      <input id="password" type="password" name="password" />
+    </div>
+    <button type="submit">Login</button>
+  </form>
+
+  <p>Don't have an account? <a href="/register">Register</a></p>
+</main>
+
+<%- include('../partials/footer') %>

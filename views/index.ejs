@@ -1,0 +1,19 @@
+<%- include('partials/header', { title: 'Welcome to MovieWatch' }) %>
+
+<main>
+  <div style="text-align:center;padding:3rem 0;">
+    <h1>Welcome to MovieWatch</h1>
+    <p class="muted">Discover, save and review your favorite movies.</p>
+    <div style="margin-top:1.5rem;display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
+      <% if (!currentUser) { %>
+        <a href="/login"><button>Login</button></a>
+        <a href="/register"><button class="secondary">Register</button></a>
+      <% } else { %>
+        <a href="/movies"><button>View Movies</button></a>
+        <a href="/logout"><button class="secondary">Logout</button></a>
+      <% } %>
+    </div>
+  </div>
+</main>
+
+<%- include('partials/footer') %>
