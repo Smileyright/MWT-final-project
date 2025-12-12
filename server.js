@@ -15,11 +15,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Session middleware (required for auth routes that use `req.session`)
+// For Vercel/serverless, use memory store (default)
 app.use(session({
     secret: process.env.SESSION_SECRET || 'change_this_secret',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }
+    cookie: { 
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
 }));
 
 // Expose current user to views
@@ -29,8 +34,12 @@ app.use((req, res, next) => {
 });
 
 // Render a homepage with quick links
-app.get('/', (req, res) => {
-    return res.render('index', { title: 'Welcome to MovieWatch' });
+app.get('/', (req, res, next) => {
+    try {
+        return res.render('index', { title: 'Welcome to MovieWatch' });
+    } catch (error) {
+        next(error);
+    }
 });
 
 const movieRoute = require('./routes/movies');
@@ -59,28 +68,55 @@ const connectDB = async () => {
     try {
         // Don't reconnect if already connected
         if (mongoose.connection.readyState === 1) {
+            console.log('Database already connected');
             return;
         }
 
-        console.log(`Attempting to connect to DB`);
-        await mongoose.connect(CONNECTION_STRING);
+        if (!CONNECTION_STRING || CONNECTION_STRING.includes('dbUser:dbUserPassword')) {
+            console.warn('Warning: Using default MongoDB connection string. Set MONGODB_URI environment variable!');
+        }
+
+        console.log(`Attempting to connect to DB...`);
+        await mongoose.connect(CONNECTION_STRING, {
+            serverSelectionTimeoutMS: 10000, // Timeout after 10s
+            socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
+            maxPoolSize: 10, // Maintain up to 10 socket connections
+        });
         console.log(`Database connection established successfully.`);
         // testDB()
     } catch (error) {
-        console.error(`Unable to connect to DB : ${error && error.message ? error.message : error}`);
-        throw error;
+        console.error(`Unable to connect to DB: ${error && error.message ? error.message : error}`);
+        // Don't throw - let routes handle it
+        return;
     }
 };
 
 // Connect to database on first request (works for both local and serverless)
+// This middleware must be before routes but errors won't crash the app
 app.use(async (req, res, next) => {
-    if (mongoose.connection.readyState === 0) {
-        try {
-            await connectDB();
-        } catch (error) {
-            console.error('Database connection error:', error);
-            // Don't block the request, but log the error
+    try {
+        const state = mongoose.connection.readyState;
+        // 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
+        if (state === 0) {
+            console.log('Database not connected, attempting connection...');
+            try {
+                await connectDB();
+            } catch (dbError) {
+                console.error('Failed to connect to database:', dbError.message);
+                // Continue anyway - routes will handle DB errors
+            }
+        } else if (state === 2) {
+            // Already connecting, wait a bit (max 2 seconds)
+            console.log('Database connection in progress, waiting...');
+            let waited = 0;
+            while (mongoose.connection.readyState === 2 && waited < 2000) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                waited += 100;
+            }
         }
+    } catch (error) {
+        console.error('Database middleware error:', error.message);
+        // Continue - don't crash
     }
     next();
 });
@@ -96,7 +132,30 @@ app.use((req, res) => {
 // Error handling middleware (must be last)
 app.use((err, req, res, next) => {
     console.error('Error:', err);
-    res.status(err.status || 500).send(err.message || 'Internal Server Error');
+    const status = err.status || 500;
+    const message = err.message || 'Internal Server Error';
+    
+    // Send error response
+    if (req.accepts('html')) {
+        res.status(status).send(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Error ${status}</title>
+                <link rel="stylesheet" href="/styles.css">
+            </head>
+            <body>
+                <div class="container" style="padding: 2rem; text-align: center;">
+                    <h1>Error ${status}</h1>
+                    <p>${message}</p>
+                    <a href="/">Go Home</a>
+                </div>
+            </body>
+            </html>
+        `);
+    } else {
+        res.status(status).json({ error: message });
+    }
 });
 
 // Only start listening if this file is run directly (not imported)
