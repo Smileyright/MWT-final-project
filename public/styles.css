@@ -192,6 +192,12 @@ form textarea {
   font-family: inherit;
   transition: border-color 0.2s, box-shadow 0.2s;
   background-color: #ffffff;
+  resize: vertical;
+}
+
+form textarea {
+  min-height: 100px;
+  line-height: 1.5;
 }
 
 form input[type="text"]:focus,

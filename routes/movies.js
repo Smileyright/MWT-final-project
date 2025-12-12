@@ -73,29 +73,37 @@ router.post("/add", async (req, res) => {
     if (!req.session.user) return res.redirect("/login");
 
     try {
-        const { title, description, year, genres, rating } = req.body;
+        const { title, description, year, genres } = req.body;
         const errors = [];
 
-        if (!title) errors.push("Title is needed");
-        if (!description) errors.push("Description is needed");
+        if (!title || !title.trim()) errors.push("Title is needed");
+        if (!description || !description.trim()) errors.push("Description is needed");
         if (!year) errors.push("Year is needed");
-        if (!rating) errors.push("Rating is needed");
-        if (!genres) errors.push("At least one genre is needed");
+        if (year && (isNaN(year) || parseInt(year) < 1888 || parseInt(year) > new Date().getFullYear() + 1)) {
+            errors.push("Please enter a valid year");
+        }
+        if (!genres || !genres.trim()) errors.push("At least one genre is needed");
 
         if (errors.length > 0) {
             return res.render("movies/add", { errors, old: req.body });
         }
 
+        // Clean and process genres
+        const genreArray = genres.split(",")
+            .map(g => g.trim())
+            .filter(g => g.length > 0)
+            .map(g => g.charAt(0).toUpperCase() + g.slice(1).toLowerCase());
+
         await Movie.create({
-            title,
-            description,
-            year,
-            genres: genres.split(","),
-            rating,
+            title: title.trim(),
+            description: description.trim(),
+            year: parseInt(year),
+            genres: genreArray,
             userId: req.session.user._id
         });
 
-        res.redirect("/movies");
+        // Redirect to My Movies page after adding
+        res.redirect("/movies/mine");
     } catch (e) {
         console.error('Error adding movie:', e);
         return res.render("movies/add", { errors: ["Unable to add movie. Please try again."], old: req.body });
@@ -151,22 +159,32 @@ router.post("/:id/edit", async (req, res) => {
             return res.status(403).send('Forbidden');
         }
 
-        const { title, description, year, genres, rating } = req.body;
+        const { title, description, year, genres } = req.body;
         const errors = [];
 
-        if (!title) errors.push("Title needed");
+        if (!title || !title.trim()) errors.push("Title needed");
         if (!year) errors.push("Year needed");
+        if (year && (isNaN(year) || parseInt(year) < 1888 || parseInt(year) > new Date().getFullYear() + 1)) {
+            errors.push("Please enter a valid year");
+        }
 
         if (errors.length > 0) {
             return res.render("movies/edit", { movie, errors });
         }
 
+        // Clean and process genres
+        const genreArray = genres && genres.trim() 
+            ? genres.split(",")
+                .map(g => g.trim())
+                .filter(g => g.length > 0)
+                .map(g => g.charAt(0).toUpperCase() + g.slice(1).toLowerCase())
+            : movie.genres;
+
         await Movie.findByIdAndUpdate(req.params.id, {
-            title,
-            description,
-            year,
-            genres: genres ? genres.split(",") : movie.genres,
-            rating
+            title: title.trim(),
+            description: description ? description.trim() : movie.description,
+            year: parseInt(year),
+            genres: genreArray
         });
 
         res.redirect(`/movies/${req.params.id}`);

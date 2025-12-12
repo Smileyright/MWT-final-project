@@ -1,22 +1,36 @@
 <%- include('../partials/header', {title: 'My Movies'}) %>
 
 <main>
-    <h2>My Movies</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+        <h2 style="margin:0;">My Movies</h2>
+        <a href="/movies/add">
+            <button style="font-size:1rem;padding:0.75rem 1.5rem;">+ Add New Movie</button>
+        </a>
+    </div>
 
     <% if (!movies || movies.length === 0) { %>
-        <p class="muted">You haven't added any movies yet. <a href="/movies/add">Add your first movie</a>.</p>
+        <div style="text-align:center;padding:4rem 2rem;background:linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);border-radius:0.75rem;box-shadow:0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
+            <h3 style="margin-bottom:1rem;color:#1e293b;">You haven't added any movies yet</h3>
+            <p class="muted" style="margin-bottom:2rem;">Start building your movie collection by adding your first movie!</p>
+            <a href="/movies/add">
+                <button style="font-size:1.1rem;padding:0.875rem 2rem;">Add Your First Movie</button>
+            </a>
+        </div>
     <% } else { %>
+        <p class="muted" style="margin-bottom:1.5rem;">You have <%= movies.length %> movie<%= movies.length !== 1 ? 's' : '' %> in your collection.</p>
         <div class="card-grid">
             <% movies.forEach(function(movie){ %>
                 <div class="card">
                     <h3><a href="/movies/<%= movie._id %>"><%= movie.title %></a></h3>
-                    <p class="muted">Year: <%= movie.year %> • Rating: <%= movie.rating %></p>
-                    <p><%= movie.description ? movie.description.substring(0,120) : '' %>...</p>
+                    <p class="muted">Year: <%= movie.year %></p>
+                    <p><%= movie.description ? movie.description.substring(0,120) : '' %><% if (movie.description && movie.description.length > 120) { %>...<% } %></p>
                     <p class="muted">Genres: <%= movie.genres ? movie.genres.join(', ') : '—' %></p>
-                    <div style="margin-top:.5rem;">
-                        <a href="/movies/<%= movie._id %>/edit"><button>Edit</button></a>
+                    <div style="margin-top:1rem;display:flex;gap:0.75rem;flex-wrap:wrap;">
+                        <a href="/movies/<%= movie._id %>/edit">
+                            <button style="font-size:0.9rem;padding:0.5rem 1rem;">Edit</button>
+                        </a>
                         <form action="/movies/<%= movie._id %>/delete" method="post" style="display:inline;">
-                            <button onclick="return confirm('Delete this movie?')" class="secondary">Delete</button>
+                            <button type="submit" onclick="return confirm('Are you sure you want to delete <%= movie.title %>?')" class="secondary" style="font-size:0.9rem;padding:0.5rem 1rem;">Delete</button>
                         </form>
                     </div>
                 </div>

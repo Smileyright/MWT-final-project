@@ -1,7 +1,12 @@
 <%- include('../partials/header', {title: 'Movies'}) %>
 
 <main>
-    <h2>Add New Movie</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+        <h2 style="margin:0;">Add New Movie</h2>
+        <a href="/movies/mine">
+            <button class="secondary" style="font-size:0.9rem;padding:0.5rem 1rem;">← Back to My Movies</button>
+        </a>
+    </div>
     <% if (errors && errors.length) { %>
         <div class="errors">
             <ul>
@@ -19,21 +24,11 @@
             </div>
             <div>
                 <label for="description">Description</label>
-                <input type="text" id="description" name="description" required value="<%= old && old.description ? old.description : '' %>">
+                <textarea id="description" name="description" rows="4" required><%= old && old.description ? old.description : '' %></textarea>
             </div>
             <div>
                 <label for="year">Year</label>
                 <input type="text" id="year" name="year" required value="<%= old && old.year ? old.year : '' %>">
-            </div>
-            <div>
-                <label>Rating</label>
-                <div style="display:flex;gap:.5rem;flex-wrap:wrap">
-                    <label><input type="radio" name="rating" value="1" required> 1</label>
-                    <label><input type="radio" name="rating" value="2" required> 2</label>
-                    <label><input type="radio" name="rating" value="3" required> 3</label>
-                    <label><input type="radio" name="rating" value="4" required> 4</label>
-                    <label><input type="radio" name="rating" value="5" required> 5</label>
-                </div>
             </div>
             <div>
                 <label for="genres">Genres (comma separated)</label>
@@ -41,7 +36,9 @@
             </div>
 
             <button type="submit">Add Movie</button>
-            <a href="/movies" class="secondary" style="margin-left:.5rem"><button type="button" class="secondary">Cancel</button></a>
+            <a href="/movies/mine" style="margin-left:.5rem">
+                <button type="button" class="secondary">Cancel</button>
+            </a>
         </form>
     </div>
 </main>

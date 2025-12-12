@@ -33,15 +33,6 @@ app.use((req, res, next) => {
     next();
 });
 
-// Render a homepage with quick links
-app.get('/', (req, res, next) => {
-    try {
-        return res.render('index', { title: 'Welcome to MovieWatch' });
-    } catch (error) {
-        next(error);
-    }
-});
-
 const movieRoute = require('./routes/movies');
 const authRoute = require('./routes/auth');
 
@@ -119,6 +110,52 @@ app.use(async (req, res, next) => {
         // Continue - don't crash
     }
     next();
+});
+
+// Render a homepage with movies (after DB connection middleware)
+app.get('/', async (req, res) => {
+    // Initialize with defaults
+    let movies = [];
+    let genres = [];
+    
+    try {
+        // Ensure database is connected
+        if (mongoose.connection.readyState === 0) {
+            try {
+                await connectDB();
+            } catch (dbErr) {
+                console.error('Database connection failed:', dbErr.message);
+            }
+        }
+        
+        // Only query if database is connected
+        if (mongoose.connection.readyState === 1) {
+            try {
+                // Load distinct genres
+                const genreList = await Movie.distinct('genres');
+                genres = Array.isArray(genreList) ? genreList.sort() : [];
+                
+                // Show all movies
+                const movieList = await Movie.find().sort({ _id: -1 }).limit(12);
+                movies = Array.isArray(movieList) ? movieList : [];
+            } catch (e) {
+                console.error('Failed to load movies for homepage:', e && e.message ? e.message : e);
+                movies = [];
+                genres = [];
+            }
+        }
+    } catch (error) {
+        console.error('Homepage route error:', error);
+        movies = [];
+        genres = [];
+    }
+    
+    // Always render with defined variables
+    return res.render('index', { 
+        title: 'Welcome to MovieWatch',
+        movies: movies,
+        genres: genres
+    });
 });
 
 app.use("/", authRoute);
