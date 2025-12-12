@@ -23,7 +23,7 @@ function ensureDbName(uri) {
 }
 
 async function run() {
-  const rawUri = process.env.MONGODB_URI;
+  const rawUri = process.env.MONGODB_URI || 'mongodb+srv://dbUser:dbUserPassword@cluster0.nyug8pi.mongodb.net/FinalProject';
   if (!rawUri) {
     console.error('No MONGODB_URI found in environment. Set it in your .env file.');
     process.exit(1);

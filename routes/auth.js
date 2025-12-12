@@ -72,8 +72,15 @@ router.post("/login", async (req, res) => {
 
         // store minimal user info in session
         req.session.user = { _id: user._id.toString(), username: user.username, name: user.name };
-
-        return res.redirect("/movies");
+        
+        // Save session before redirect
+        req.session.save((err) => {
+            if (err) {
+                console.error('Error saving session:', err);
+                return res.render("auth/login", { errors: ["Unable to save session"] });
+            }
+            return res.redirect("/movies");
+        });
     } catch (e) {
         console.error(e);
         return res.render("auth/login", { errors: ["Unable to login"] });
@@ -82,8 +89,13 @@ router.post("/login", async (req, res) => {
 
 //Logout
 router.get("/logout", (req, res) => {
-    req.session.destroy(() => {
-        res.redirect("/login");
+    const sessionName = req.session && req.session.cookie ? 'moviewatch.sid' : 'connect.sid';
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Error destroying session:', err);
+        }
+        res.clearCookie('moviewatch.sid');
+        res.redirect("/");
     });
 });
 

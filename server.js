@@ -17,19 +17,25 @@ app.use(express.urlencoded({ extended: true }));
 // Session middleware (required for auth routes that use `req.session`)
 // For Vercel/serverless, use memory store (default)
 app.use(session({
+    name: 'moviewatch.sid',
     secret: process.env.SESSION_SECRET || 'change_this_secret',
     resave: false,
     saveUninitialized: false,
     cookie: { 
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        sameSite: 'lax'
     }
 }));
 
-// Expose current user to views
+// Expose current user to views (must be after session middleware)
 app.use((req, res, next) => {
-    res.locals.currentUser = req.session && req.session.user ? req.session.user : null;
+    if (req.session && req.session.user) {
+        res.locals.currentUser = req.session.user;
+    } else {
+        res.locals.currentUser = null;
+    }
     next();
 });
 
