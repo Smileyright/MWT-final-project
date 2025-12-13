@@ -5,7 +5,9 @@ const mongoose = require('mongoose');
 const Movie = require('./models/movie');
 const path = require('path');
 const session = require('express-session');
-const MongoStore = require('connect-mongo');
+// connect-mongo v6+ exports an object with MongoStore as a property
+const MongoStoreModule = require('connect-mongo');
+const MongoStore = MongoStoreModule.MongoStore || MongoStoreModule.default || MongoStoreModule;
 const PORT = process.env.PORT || 8000;
 const CONNECTION_STRING = process.env.MONGODB_URI;
 
@@ -40,11 +42,18 @@ const sessionConfig = {
 
 // Use MongoDB store if connection string is available, otherwise fall back to memory store
 if (CONNECTION_STRING) {
-    sessionConfig.store = MongoStore.create({
-        mongoUrl: CONNECTION_STRING,
-        touchAfter: 24 * 3600, // lazy session update (24 hours)
-        ttl: 24 * 60 * 60, // 24 hours
-    });
+    try {
+        // connect-mongo v6+ API - use constructor
+        sessionConfig.store = new MongoStore({
+            mongoUrl: CONNECTION_STRING,
+            touchAfter: 24 * 3600, // lazy session update (24 hours)
+            ttl: 24 * 60 * 60, // 24 hours
+        });
+        console.log('MongoDB session store configured successfully');
+    } catch (storeError) {
+        console.error('Error creating MongoStore:', storeError);
+        console.warn('Falling back to memory store');
+    }
 } else {
     console.warn('WARNING: MONGODB_URI not set. Sessions will use memory store (not persistent).');
 }
