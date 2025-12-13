@@ -29,23 +29,23 @@ router.get("/", async (req, res) => {
 });
 
 // My movies - list only movies created by the logged-in user
-router.get('/mine', async (req, res) => {
+router.get('/mymovies', async (req, res) => {
     if (!req.session || !req.session.user) return res.redirect('/login');
 
     try {
         // Check database connection
         if (mongoose.connection.readyState !== 1) {
             console.error('Database not connected when loading user movies');
-            return res.render('movies/mine', { movies: [], currentUser: req.session.user, error: "Database connection issue. Please try again." });
+            return res.render('movies/mymovies', { movies: [], currentUser: req.session.user, error: "Database connection issue. Please try again." });
         }
 
         // Convert string ID to ObjectId for proper querying
         const myId = new mongoose.Types.ObjectId(req.session.user._id);
         const movies = await Movie.find({ userId: myId }).sort({ _id: -1 });
-        return res.render('movies/mine', { movies, currentUser: req.session.user });
+        return res.render('movies/mymovies', { movies, currentUser: req.session.user });
     } catch (e) {
         console.error('Failed to load user movies', e && e.message ? e.message : e);
-        return res.render('movies/mine', { movies: [], currentUser: req.session.user });
+        return res.render('movies/mymovies', { movies: [], currentUser: req.session.user });
     }
 });
 
@@ -136,7 +136,7 @@ router.post("/add", async (req, res) => {
         });
 
         // Redirect to My Movies page after adding
-        res.redirect("/movies/mine");
+        res.redirect("/movies/mymovies");
     } catch (e) {
         console.error('Error adding movie:', e);
         return res.render("movies/add", { errors: ["Unable to add movie. Please try again."], old: req.body });

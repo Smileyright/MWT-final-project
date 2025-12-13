@@ -19,7 +19,7 @@ build/
 coverage/
 
 # Optional package manager files
-package-lock.json
+# package-lock.json - Keep this for Vercel deployment
 yarn.lock
 
 # IDE files
