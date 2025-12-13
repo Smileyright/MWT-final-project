@@ -38,10 +38,41 @@ router.get('/mymovies', async (req, res) => {
     if (!req.session || !req.session.user) return res.redirect('/login');
 
     try {
-        // Check database connection
+        // Check database connection and wait if connecting
+        const state = mongoose.connection.readyState;
+        if (state === 0) {
+            // Not connected - try to connect
+            console.log('Database not connected, attempting connection...');
+            try {
+                await mongoose.connect(process.env.MONGODB_URI, {
+                    serverSelectionTimeoutMS: 5000,
+                    socketTimeoutMS: 45000,
+                });
+            } catch (connError) {
+                console.error('Failed to connect to database:', connError);
+                return res.render('movies/mymovies', { 
+                    movies: [], 
+                    currentUser: req.session.user, 
+                    error: "Database connection failed. Please check your MONGODB_URI and try again." 
+                });
+            }
+        } else if (state === 2) {
+            // Connecting - wait a bit
+            console.log('Database connection in progress, waiting...');
+            let waited = 0;
+            while (mongoose.connection.readyState === 2 && waited < 3000) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                waited += 100;
+            }
+        }
+
         if (mongoose.connection.readyState !== 1) {
-            console.error('Database not connected when loading user movies');
-            return res.render('movies/mymovies', { movies: [], currentUser: req.session.user, error: "Database connection issue. Please try again." });
+            console.error('Database not connected after wait. State:', mongoose.connection.readyState);
+            return res.render('movies/mymovies', { 
+                movies: [], 
+                currentUser: req.session.user, 
+                error: "Database connection issue. Please try again." 
+            });
         }
 
         // Convert string ID to ObjectId for proper querying
@@ -49,9 +80,8 @@ router.get('/mymovies', async (req, res) => {
         const myIdString = req.session.user._id.toString();
         console.log('Loading my movies for user ID (ObjectId):', myId);
         console.log('Loading my movies for user ID (String):', myIdString);
-        console.log('Session user:', req.session.user);
         
-        // Try querying with both ObjectId and string to catch any type mismatches
+        // Try querying with ObjectId
         let movies = await Movie.find({ userId: myId }).sort({ _id: -1 });
         
         // If no movies found with ObjectId, try with string
@@ -60,25 +90,24 @@ router.get('/mymovies', async (req, res) => {
             movies = await Movie.find({ userId: myIdString }).sort({ _id: -1 });
         }
         
-        // Also try querying where userId matches as string
-        if (movies.length === 0) {
-            console.log('No movies found with string, trying any userId match...');
-            const allMovies = await Movie.find().sort({ _id: -1 });
-            console.log('All movies in DB:', allMovies.map(m => ({ 
-                title: m.title, 
-                userId: m.userId ? m.userId.toString() : 'null',
-                userIdType: typeof m.userId
-            })));
-            movies = allMovies.filter(m => m.userId && m.userId.toString() === myIdString);
-        }
-        
         console.log('Found movies:', movies.length);
-        console.log('Movies:', movies.map(m => ({ title: m.title, userId: m.userId ? m.userId.toString() : 'null' })));
         
         return res.render('movies/mymovies', { movies, currentUser: req.session.user });
     } catch (e) {
-        console.error('Failed to load user movies', e && e.message ? e.message : e);
+        console.error('Failed to load user movies:', e);
+        console.error('Error code:', e.code);
+        console.error('Error message:', e.message);
         console.error('Error stack:', e.stack);
+        
+        // Handle specific MongoDB errors
+        if (e.code === -102 || e.name === 'MongoServerSelectionError' || e.name === 'MongooseError') {
+            return res.render('movies/mymovies', { 
+                movies: [], 
+                currentUser: req.session.user, 
+                error: "Database connection error. Please check your connection and try again." 
+            });
+        }
+        
         return res.render('movies/mymovies', { movies: [], currentUser: req.session.user });
     }
 });
