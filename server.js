@@ -135,8 +135,7 @@ app.get('/', (req, res) => {
     // This route should never redirect to login
     res.render('index', { 
         title: 'Welcome to MovieWatch',
-        currentUser: req.session && req.session.user ? req.session.user : null,
-        hideAuthButtons: true
+        currentUser: req.session && req.session.user ? req.session.user : null
     });
 });
 

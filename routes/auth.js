@@ -8,8 +8,7 @@ router.get("/home", (req, res) => {
     console.log('HOME ROUTE HIT from auth routes');
     res.render('index', { 
         title: 'Welcome to MovieWatch',
-        currentUser: req.session && req.session.user ? req.session.user : null,
-        hideAuthButtons: true
+        currentUser: req.session && req.session.user ? req.session.user : null
     });
 });
 

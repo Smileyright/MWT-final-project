@@ -18,19 +18,12 @@
                 <ul>
                     <li><a href="/">Home</a></li>
                     <li><a href="/movies">Movies</a></li>
-                    <% if (typeof hideAuthButtons === 'undefined' || !hideAuthButtons) { %>
-                        <% if (typeof currentUser === 'undefined' || !currentUser) { %>
-                            <li><a href="/register">Register</a></li>
-                            <li><a href="/login">Login</a></li>
-                        <% } else { %>
-                            <li><a href="/movies/mine">My Movies</a></li>
-                            <li><a href="/logout">Logout</a></li>
-                        <% } %>
-                    <% } else { %>
-                        <% if (typeof currentUser !== 'undefined' && currentUser) { %>
-                            <li><a href="/movies/mine">My Movies</a></li>
-                            <li><a href="/logout">Logout</a></li>
-                        <% } %>
+                    <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+                        <li><a href="/movies/mine">My Movies</a></li>
+                        <li><a href="/logout">Logout</a></li>
+                    <% } else if (typeof hideAuthButtons === 'undefined' || !hideAuthButtons) { %>
+                        <li><a href="/register">Register</a></li>
+                        <li><a href="/login">Login</a></li>
                     <% } %>
                 </ul>
             </nav>
