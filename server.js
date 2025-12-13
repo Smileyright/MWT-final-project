@@ -91,6 +91,25 @@ const testDB = async () => {
     }
 };
 
+// Small helper to ensure the URI has a database name. If not, append 'MWT-FINAL-PROJECT'.
+function ensureDbName(uri) {
+    try {
+        if (!uri) return uri;
+        // If there's a '/' after .mongodb.net and no database name (next char is ?), insert 'MWT-FINAL-PROJECT'
+        const idx = uri.indexOf('.mongodb.net/');
+        if (idx === -1) return uri;
+        const after = uri.substring(idx + '.mongodb.net/'.length);
+        if (after.startsWith('?') || after === '') {
+            // append DB name and keep existing query
+            const parts = uri.split('.mongodb.net/');
+            return parts[0] + '.mongodb.net/MWT-FINAL-PROJECT' + (parts[1] ? parts[1] : '');
+        }
+        return uri;
+    } catch (e) {
+        return uri;
+    }
+}
+
 const connectDB = async () => {
     try {
         // Don't reconnect if already connected
@@ -105,8 +124,10 @@ const connectDB = async () => {
             return;
         }
 
+        // Ensure database name is in the connection string
+        const uri = ensureDbName(CONNECTION_STRING);
         console.log(`Attempting to connect to DB...`);
-        await mongoose.connect(CONNECTION_STRING, {
+        await mongoose.connect(uri, {
             serverSelectionTimeoutMS: 10000, 
             socketTimeoutMS: 45000, 
             maxPoolSize: 10, 
