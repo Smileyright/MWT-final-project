@@ -14,7 +14,13 @@
 
     <% if (typeof movies === 'undefined' || !movies || movies.length === 0) { %>
         <div style="text-align:center;padding:3rem 2rem;background:#ffffff;border-radius:0.75rem;box-shadow:0 4px 6px -1px rgba(0, 0, 0, 0.1);">
-            <p class="muted" style="font-size:1.1rem;">No movies found. Try adding one.</p>
+            <p class="muted" style="font-size:1.1rem;">No movies found. 
+                <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+                    <a href="/movies/add" style="color:#6366f1;text-decoration:underline;font-weight:500;">Try adding one</a>.
+                <% } else { %>
+                    Try adding one.
+                <% } %>
+            </p>
             <% if (typeof currentUser !== 'undefined' && currentUser) { %>
                 <a href="/movies/add" style="margin-top:1rem;display:inline-block;">
                     <button>Add Movie</button>
