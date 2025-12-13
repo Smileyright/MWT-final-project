@@ -25,6 +25,25 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Small helper to ensure the URI has a database name. If not, append 'MWT-FINAL-PROJECT'.
+function ensureDbName(uri) {
+    try {
+        if (!uri) return uri;
+        // If there's a '/' after .mongodb.net and no database name (next char is ?), insert 'MWT-FINAL-PROJECT'
+        const idx = uri.indexOf('.mongodb.net/');
+        if (idx === -1) return uri;
+        const after = uri.substring(idx + '.mongodb.net/'.length);
+        if (after.startsWith('?') || after === '') {
+            // append DB name and keep existing query
+            const parts = uri.split('.mongodb.net/');
+            return parts[0] + '.mongodb.net/MWT-FINAL-PROJECT' + (parts[1] ? parts[1] : '');
+        }
+        return uri;
+    } catch (e) {
+        return uri;
+    }
+}
+
 // Session middleware (required for auth routes that use `req.session`)
 // For Vercel/serverless, use MongoDB store to persist sessions across function invocations
 const sessionConfig = {
@@ -43,9 +62,11 @@ const sessionConfig = {
 // Use MongoDB store if connection string is available, otherwise fall back to memory store
 if (CONNECTION_STRING) {
     try {
+        // Ensure database name is in the connection string for session store too
+        const sessionStoreUri = ensureDbName(CONNECTION_STRING);
         // connect-mongo v6+ API - use constructor
         sessionConfig.store = new MongoStore({
-            mongoUrl: CONNECTION_STRING,
+            mongoUrl: sessionStoreUri,
             touchAfter: 24 * 3600, // lazy session update (24 hours)
             ttl: 24 * 60 * 60, // 24 hours
         });
@@ -90,25 +111,6 @@ const testDB = async () => {
         console.log(e);
     }
 };
-
-// Small helper to ensure the URI has a database name. If not, append 'MWT-FINAL-PROJECT'.
-function ensureDbName(uri) {
-    try {
-        if (!uri) return uri;
-        // If there's a '/' after .mongodb.net and no database name (next char is ?), insert 'MWT-FINAL-PROJECT'
-        const idx = uri.indexOf('.mongodb.net/');
-        if (idx === -1) return uri;
-        const after = uri.substring(idx + '.mongodb.net/'.length);
-        if (after.startsWith('?') || after === '') {
-            // append DB name and keep existing query
-            const parts = uri.split('.mongodb.net/');
-            return parts[0] + '.mongodb.net/MWT-FINAL-PROJECT' + (parts[1] ? parts[1] : '');
-        }
-        return uri;
-    } catch (e) {
-        return uri;
-    }
-}
 
 const connectDB = async () => {
     try {
