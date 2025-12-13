@@ -3,10 +3,10 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
 
-// Home route
+// Homepage route - different from root
 router.get("/home", (req, res) => {
     res.render('home', { 
-        title: 'Home - MovieWatch',
+        title: 'Homepage - MovieWatch',
         currentUser: req.session && req.session.user ? req.session.user : null
     });
 });

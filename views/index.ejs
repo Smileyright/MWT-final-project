@@ -1,9 +1,9 @@
-<%- include('partials/header', { title: 'Welcome to MovieWatch' }) %>
+<%- include('partials/header', { title: 'MovieWatch' }) %>
 
 <main>
     <div style="text-align:center;padding:4rem 0;">
-        <h1>Welcome to MovieWatch</h1>
-        <p class="muted" style="margin-top:1rem;margin-bottom:2rem;">Your personal movie collection manager</p>
+        <h1 style="font-size:3rem;margin-bottom:1rem;">MovieWatch</h1>
+        <p class="muted" style="margin-top:1rem;margin-bottom:2rem;font-size:1.2rem;">Your personal movie collection manager</p>
         <% if (typeof currentUser !== 'undefined' && currentUser) { %>
             <div style="margin-top:3rem;">
                 <a href="/movies"><button style="margin:0 1rem; padding:0.75rem 2rem; font-size:1.1rem;">Browse Movies</button></a>

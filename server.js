@@ -172,12 +172,10 @@ app.use(async (req, res, next) => {
 });
 
 
-// Home route - always public, never requires authentication
+// Root route - MovieWatch branding/landing page
 app.get('/', (req, res) => {
-    // Always show welcome page - no authentication required
-    // This route should never redirect to login
     res.render('index', { 
-        title: 'Welcome to MovieWatch',
+        title: 'MovieWatch',
         currentUser: req.session && req.session.user ? req.session.user : null
     });
 });
