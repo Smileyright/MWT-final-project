@@ -1,71 +1,87 @@
-<%- include('../partials/header', {title: movie.title}) %>
+<%- include('../partials/header', {title: typeof movie !== 'undefined' && movie.title ? movie.title : 'Movie Details'}) %>
 
 <main>
-  <div style="margin-bottom:1.5rem;">
-    <a href="/movies" style="color:#6366f1;text-decoration:none;">← Back to Movies</a>
-  </div>
-
-  <div style="background:#ffffff;border-radius:0.75rem;padding:2rem;box-shadow:0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);border:1px solid #e2e8f0;">
     <div style="margin-bottom:1.5rem;">
-      <h1 style="font-size:2.5rem;margin-bottom:0.5rem;color:#1e293b;"><%= movie.title %></h1>
-      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;">
-        <div>
-          <span style="font-weight:600;color:#64748b;">Year:</span>
-          <span style="color:#1e293b;font-size:1.1rem;"><%= movie.year %></span>
-        </div>
-      </div>
+        <a href="/movies" style="color:#6366f1;text-decoration:none;font-weight:500;">← Back to Movies</a>
     </div>
 
-    <div style="margin-bottom:2rem;padding:1.5rem;background:#f8fafc;border-radius:0.5rem;border-left:4px solid #6366f1;">
-      <h3 style="margin-bottom:0.75rem;color:#1e293b;font-size:1.25rem;">Description</h3>
-      <p style="line-height:1.8;color:#475569;font-size:1.05rem;margin:0;"><%= movie.description %></p>
-    </div>
-
-    <div style="margin-bottom:2rem;">
-      <h3 style="margin-bottom:0.75rem;color:#1e293b;font-size:1.25rem;">Genres</h3>
-      <div style="display:flex;flex-wrap:wrap;gap:0.75rem;">
-        <% if (movie.genres && movie.genres.length > 0) { %>
-          <% movie.genres.forEach(function(genre){ %>
-            <a href="/movies/genre/<%= encodeURIComponent(genre) %>" class="chip"><%= genre %></a>
-          <% }) %>
-        <% } else { %>
-          <span class="muted">No genres specified</span>
-        <% } %>
-      </div>
-    </div>
-
-    <div style="padding-top:1.5rem;border-top:2px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
-      <div>
-        <% if (isOwner) { %>
-          <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
-            <a href="/movies/<%= movie._id %>/edit">
-              <button>Edit Movie</button>
+    <% if (typeof movie === 'undefined' || !movie) { %>
+        <div style="text-align:center;padding:3rem 2rem;background:#ffffff;border-radius:0.75rem;box-shadow:0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+            <p class="muted" style="font-size:1.1rem;">Movie not found.</p>
+            <a href="/movies" style="margin-top:1rem;display:inline-block;">
+                <button>View All Movies</button>
             </a>
-            <form action="/movies/<%= movie._id %>/delete" method="post" style="display:inline;">
-              <button type="submit" onclick="return confirm('Are you sure you want to delete <%= movie.title %>? This action cannot be undone.')" class="secondary">Delete Movie</button>
-            </form>
-          </div>
-        <% } else { %>
-          <p class="muted" style="margin:0;">This movie was added by another user.</p>
-        <% } %>
-      </div>
-      <div>
-        <a href="/movies" style="color:#6366f1;text-decoration:none;font-weight:500;">View All Movies →</a>
-      </div>
-    </div>
-  </div>
+        </div>
+    <% } else { %>
+        <div style="background:#ffffff;border-radius:0.75rem;padding:2rem;box-shadow:0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);border:1px solid #e2e8f0;">
+            <div style="margin-bottom:1.5rem;">
+                <h1 style="font-size:2.5rem;margin-bottom:0.5rem;color:#1e293b;"><%= movie.title || 'Untitled' %></h1>
+                <div style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;">
+                    <div>
+                        <span style="font-weight:600;color:#64748b;">Year:</span>
+                        <span style="color:#1e293b;font-size:1.1rem;"><%= movie.year || '—' %></span>
+                    </div>
+                </div>
+            </div>
 
-  <!-- Movie Information Summary Card -->
-  <div style="margin-top:2rem;display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:1rem;">
-    <div style="background:#ffffff;padding:1.5rem;border-radius:0.5rem;box-shadow:0 1px 2px 0 rgba(0, 0, 0, 0.05);border:1px solid #e2e8f0;">
-      <div style="font-size:0.875rem;color:#64748b;margin-bottom:0.5rem;">Release Year</div>
-      <div style="font-size:1.5rem;font-weight:700;color:#1e293b;"><%= movie.year %></div>
-    </div>
-    <div style="background:#ffffff;padding:1.5rem;border-radius:0.5rem;box-shadow:0 1px 2px 0 rgba(0, 0, 0, 0.05);border:1px solid #e2e8f0;">
-      <div style="font-size:0.875rem;color:#64748b;margin-bottom:0.5rem;">Genres</div>
-      <div style="font-size:1.5rem;font-weight:700;color:#1e293b;"><%= movie.genres ? movie.genres.length : 0 %></div>
-    </div>
-  </div>
+            <% if (movie.description && movie.description.trim()) { %>
+                <div style="margin-bottom:2rem;padding:1.5rem;background:#f8fafc;border-radius:0.5rem;border-left:4px solid #6366f1;">
+                    <h3 style="margin-bottom:0.75rem;color:#1e293b;font-size:1.25rem;">Description</h3>
+                    <p style="line-height:1.8;color:#475569;font-size:1.05rem;margin:0;white-space:pre-wrap;"><%= movie.description %></p>
+                </div>
+            <% } else { %>
+                <div style="margin-bottom:2rem;padding:1.5rem;background:#f8fafc;border-radius:0.5rem;border-left:4px solid #e2e8f0;">
+                    <h3 style="margin-bottom:0.75rem;color:#1e293b;font-size:1.25rem;">Description</h3>
+                    <p class="muted" style="margin:0;">No description available.</p>
+                </div>
+            <% } %>
+
+            <div style="margin-bottom:2rem;">
+                <h3 style="margin-bottom:0.75rem;color:#1e293b;font-size:1.25rem;">Genres</h3>
+                <div style="display:flex;flex-wrap:wrap;gap:0.75rem;">
+                    <% if (movie.genres && movie.genres.length > 0) { %>
+                        <% movie.genres.forEach(function(genre){ %>
+                            <a href="/movies/genre/<%= encodeURIComponent(genre) %>" class="chip"><%= genre %></a>
+                        <% }) %>
+                    <% } else { %>
+                        <span class="muted">No genres specified</span>
+                    <% } %>
+                </div>
+            </div>
+
+            <div style="padding-top:1.5rem;border-top:2px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+                <div>
+                    <% if (typeof isOwner !== 'undefined' && isOwner) { %>
+                        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+                            <a href="/movies/<%= movie._id %>/edit">
+                                <button>Edit Movie</button>
+                            </a>
+                            <form action="/movies/<%= movie._id %>/delete" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this movie? This action cannot be undone.');">
+                                <button type="submit" class="secondary">Delete Movie</button>
+                            </form>
+                        </div>
+                    <% } else { %>
+                        <p class="muted" style="margin:0;">This movie was added by another user.</p>
+                    <% } %>
+                </div>
+                <div>
+                    <a href="/movies" style="color:#6366f1;text-decoration:none;font-weight:500;">View All Movies →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Movie Information Summary Card -->
+        <div style="margin-top:2rem;display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:1rem;">
+            <div style="background:#ffffff;padding:1.5rem;border-radius:0.5rem;box-shadow:0 1px 2px 0 rgba(0, 0, 0, 0.05);border:1px solid #e2e8f0;">
+                <div style="font-size:0.875rem;color:#64748b;margin-bottom:0.5rem;">Release Year</div>
+                <div style="font-size:1.5rem;font-weight:700;color:#1e293b;"><%= movie.year || '—' %></div>
+            </div>
+            <div style="background:#ffffff;padding:1.5rem;border-radius:0.5rem;box-shadow:0 1px 2px 0 rgba(0, 0, 0, 0.05);border:1px solid #e2e8f0;">
+                <div style="font-size:0.875rem;color:#64748b;margin-bottom:0.5rem;">Genres</div>
+                <div style="font-size:1.5rem;font-weight:700;color:#1e293b;"><%= movie.genres ? movie.genres.length : 0 %></div>
+            </div>
+        </div>
+    <% } %>
 </main>
 
 <%- include('../partials/footer') %>

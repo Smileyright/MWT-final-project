@@ -3,6 +3,16 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
 
+// Home route
+router.get("/home", (req, res) => {
+    console.log('HOME ROUTE HIT from auth routes');
+    res.render('index', { 
+        title: 'Welcome to MovieWatch',
+        currentUser: req.session && req.session.user ? req.session.user : null,
+        hideAuthButtons: true
+    });
+});
+
 //Register form
 router.get("/register", (req, res) => {
     res.render("auth/register", { errors: [], old: {} });

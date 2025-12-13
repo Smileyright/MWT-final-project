@@ -1,29 +1,33 @@
 <%- include('../partials/header', { title: 'Login' }) %>
 
 <main>
-  <h2>Login</h2>
+    <h2>Login</h2>
 
-  <% if (errors && errors.length) { %>
-    <ul style="color: red;">
-      <% errors.forEach(function(err){ %>
-        <li><%= err %></li>
-      <% }) %>
-    </ul>
-  <% } %>
+    <% if (typeof errors !== 'undefined' && errors && errors.length) { %>
+        <div class="errors">
+            <ul>
+                <% errors.forEach(function(err){ %>
+                    <li><%= err %></li>
+                <% }) %>
+            </ul>
+        </div>
+    <% } %>
 
-  <form action="/login" method="post">
-    <div>
-      <label for="username">Username</label>
-      <input id="username" name="username" />
+    <div class="form-container">
+        <form action="/login" method="post">
+            <div>
+                <label for="username">Username</label>
+                <input id="username" name="username" type="text" required autofocus />
+            </div>
+            <div>
+                <label for="password">Password</label>
+                <input id="password" type="password" name="password" required />
+            </div>
+            <button type="submit">Login</button>
+        </form>
     </div>
-    <div>
-      <label for="password">Password</label>
-      <input id="password" type="password" name="password" />
-    </div>
-    <button type="submit">Login</button>
-  </form>
 
-  <p>Don't have an account? <a href="/register">Register</a></p>
+    <p style="text-align:center;margin-top:1.5rem;">Don't have an account? <a href="/register">Register</a></p>
 </main>
 
 <%- include('../partials/footer') %>

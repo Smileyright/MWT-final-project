@@ -1,12 +1,19 @@
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
 const Movie = require("../models/movie");
 
 //List
 router.get("/", async (req, res) => {
-    let movies;
+    let movies = [];
     let genres = [];
     try {
+        // Check database connection
+        if (mongoose.connection.readyState !== 1) {
+            console.error('Database not connected when loading movies');
+            return res.render("movies/index", { movies: [], genres: [], error: "Database connection issue. Please try again." });
+        }
+
         // load distinct genres for the sidebar
         genres = await Movie.distinct('genres');
         genres = (genres || []).sort();
@@ -26,12 +33,19 @@ router.get('/mine', async (req, res) => {
     if (!req.session || !req.session.user) return res.redirect('/login');
 
     try {
-        const myId = req.session.user._id;
+        // Check database connection
+        if (mongoose.connection.readyState !== 1) {
+            console.error('Database not connected when loading user movies');
+            return res.render('movies/mine', { movies: [], currentUser: req.session.user, error: "Database connection issue. Please try again." });
+        }
+
+        // Convert string ID to ObjectId for proper querying
+        const myId = new mongoose.Types.ObjectId(req.session.user._id);
         const movies = await Movie.find({ userId: myId }).sort({ _id: -1 });
-        return res.render('movies/mine', { movies });
+        return res.render('movies/mine', { movies, currentUser: req.session.user });
     } catch (e) {
         console.error('Failed to load user movies', e && e.message ? e.message : e);
-        return res.render('movies/mine', { movies: [] });
+        return res.render('movies/mine', { movies: [], currentUser: req.session.user });
     }
 });
 
@@ -48,6 +62,12 @@ router.get('/genre/:genre', async (req, res) => {
     let genres = [];
 
     try {
+        // Check database connection
+        if (mongoose.connection.readyState !== 1) {
+            console.error('Database not connected when loading movies by genre');
+            return res.render('movies/genre', { movies: [], genres: [], selectedGenre: genre, error: "Database connection issue. Please try again." });
+        }
+
         genres = await Movie.distinct('genres');
         genres = (genres || []).sort();
 
@@ -64,15 +84,20 @@ router.get('/genre/:genre', async (req, res) => {
 
 //Add
 router.get("/add", (req, res) => {
-    if (!req.session.user) return res.redirect("/login");
+    if (!req.session || !req.session.user) return res.redirect("/login");
 
     res.render("movies/add", { errors: [], old: {} });
 });
 
 router.post("/add", async (req, res) => {
-    if (!req.session.user) return res.redirect("/login");
+    if (!req.session || !req.session.user) return res.redirect("/login");
 
     try {
+        // Check database connection
+        if (mongoose.connection.readyState !== 1) {
+            console.error('Database not connected when adding movie');
+            return res.render("movies/add", { errors: ["Database connection issue. Please try again."], old: req.body });
+        }
         const { title, description, year, genres } = req.body;
         const errors = [];
 
@@ -94,12 +119,15 @@ router.post("/add", async (req, res) => {
             .filter(g => g.length > 0)
             .map(g => g.charAt(0).toUpperCase() + g.slice(1).toLowerCase());
 
+        // Convert string ID to ObjectId for proper storage
+        const userId = new mongoose.Types.ObjectId(req.session.user._id);
+        
         await Movie.create({
             title: title.trim(),
             description: description.trim(),
             year: parseInt(year),
             genres: genreArray,
-            userId: req.session.user._id
+            userId: userId
         });
 
         // Redirect to My Movies page after adding
@@ -113,11 +141,17 @@ router.post("/add", async (req, res) => {
 //Details
 router.get("/:id", async (req, res) => {
     try {
+        // Check database connection
+        if (mongoose.connection.readyState !== 1) {
+            console.error('Database not connected when loading movie details');
+            return res.status(503).send("Database connection issue. Please try again.");
+        }
+
         const movie = await Movie.findById(req.params.id);
 
         if (!movie) return res.status(404).send("Movie not found");
 
-        const isOwner = req.session.user && movie.userId && movie.userId.toString() === req.session.user._id.toString();
+        const isOwner = req.session && req.session.user && movie.userId && movie.userId.toString() === req.session.user._id.toString();
 
         res.render("movies/detail", { movie, isOwner });
     } catch (e) {
@@ -128,9 +162,15 @@ router.get("/:id", async (req, res) => {
 
 //Edit
 router.get("/:id/edit", async (req, res) => {
-    if (!req.session.user) return res.redirect("/login");
+    if (!req.session || !req.session.user) return res.redirect("/login");
 
     try {
+        // Check database connection
+        if (mongoose.connection.readyState !== 1) {
+            console.error('Database not connected when loading movie for edit');
+            return res.status(503).send("Database connection issue. Please try again.");
+        }
+
         const movie = await Movie.findById(req.params.id);
         if (!movie) return res.status(404).send("Movie not found");
 
@@ -148,9 +188,16 @@ router.get("/:id/edit", async (req, res) => {
 
 //Post
 router.post("/:id/edit", async (req, res) => {
-    if (!req.session.user) return res.redirect("/login");
+    if (!req.session || !req.session.user) return res.redirect("/login");
 
     try {
+        // Check database connection
+        if (mongoose.connection.readyState !== 1) {
+            console.error('Database not connected when editing movie');
+            const movie = await Movie.findById(req.params.id).catch(() => null);
+            return res.render("movies/edit", { movie: movie || {}, errors: ["Database connection issue. Please try again."] });
+        }
+
         const movie = await Movie.findById(req.params.id);
         if (!movie) return res.status(404).send("Movie not found");
 
@@ -197,9 +244,15 @@ router.post("/:id/edit", async (req, res) => {
 
 //Delete
 router.post("/:id/delete", async (req, res) => {
-    if (!req.session.user) return res.redirect("/login");
+    if (!req.session || !req.session.user) return res.redirect("/login");
 
     try {
+        // Check database connection
+        if (mongoose.connection.readyState !== 1) {
+            console.error('Database not connected when deleting movie');
+            return res.status(503).send("Database connection issue. Please try again.");
+        }
+
         const movie = await Movie.findById(req.params.id);
         if (!movie) return res.status(404).send("Movie not found");
 

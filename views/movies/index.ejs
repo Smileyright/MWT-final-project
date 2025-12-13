@@ -3,7 +3,7 @@
 <main>
     <h2>Movies</h2>
 
-    <% if (genres && genres.length > 0) { %>
+    <% if (typeof genres !== 'undefined' && genres && genres.length > 0) { %>
         <div class="genres-bar" style="margin:1rem 0;padding:0 1rem;">
             <strong>Genres:</strong>
             <% genres.forEach(function(g){ %>
@@ -12,16 +12,28 @@
         </div>
     <% } %>
 
-    <% if (!movies || movies.length === 0) { %>
-        <p class="muted">No movies found. Try adding one.</p>
+    <% if (typeof movies === 'undefined' || !movies || movies.length === 0) { %>
+        <div style="text-align:center;padding:3rem 2rem;background:#ffffff;border-radius:0.75rem;box-shadow:0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+            <p class="muted" style="font-size:1.1rem;">No movies found. Try adding one.</p>
+            <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+                <a href="/movies/add" style="margin-top:1rem;display:inline-block;">
+                    <button>Add Movie</button>
+                </a>
+            <% } %>
+        </div>
     <% } else { %>
+        <p class="muted" style="margin-bottom:1.5rem;">Found <%= movies.length %> movie<%= movies.length !== 1 ? 's' : '' %>.</p>
         <div class="card-grid">
             <% movies.forEach(function(movie){ %>
                 <div class="card">
-                    <h3><a href="/movies/<%= movie._id %>"><%= movie.title %></a></h3>
-                    <p class="muted">Year: <%= movie.year %></p>
-                    <p><%= movie.description ? movie.description.substring(0,120) : '' %>...</p>
-                    <p class="muted">Genres: <%= movie.genres ? movie.genres.join(', ') : '—' %></p>
+                    <h3><a href="/movies/<%= movie._id %>"><%= movie.title || 'Untitled' %></a></h3>
+                    <p class="muted">Year: <%= movie.year || '—' %></p>
+                    <% if (movie.description && movie.description.trim()) { %>
+                        <p><%= movie.description.length > 120 ? movie.description.substring(0,120) + '...' : movie.description %></p>
+                    <% } else { %>
+                        <p class="muted">No description available.</p>
+                    <% } %>
+                    <p class="muted">Genres: <%= movie.genres && movie.genres.length > 0 ? movie.genres.join(', ') : '—' %></p>
                 </div>
             <% }) %>
         </div>

@@ -14,7 +14,7 @@ function ensureDbName(uri) {
     if (after.startsWith('?') || after === '') {
       // append DB name and keep existing query
       const parts = uri.split('.mongodb.net/');
-      return parts[0] + '.mongodb.net/FinalProject' + (parts[1] ? parts[1] : '');
+      return parts[0] + '.mongodb.net/MWT-FINAL-PROJECT' + (parts[1] ? parts[1] : '');
     }
     return uri;
   } catch (e) {
@@ -23,16 +23,28 @@ function ensureDbName(uri) {
 }
 
 async function run() {
-  const rawUri = process.env.MONGODB_URI || 'mongodb+srv://dbUser:dbUserPassword@cluster0.nyug8pi.mongodb.net/FinalProject';
+  const rawUri = process.env.MONGODB_URI;
   if (!rawUri) {
-    console.error('No MONGODB_URI found in environment. Set it in your .env file.');
+    console.error('ERROR: MONGODB_URI environment variable is not set.');
+    console.error('Please set MONGODB_URI in your .env file or environment variables.');
+    console.error('Example: MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database');
     process.exit(1);
   }
 
   const uri = ensureDbName(rawUri);
   console.log('Using Mongo URI:', uri.replace(/([A-Za-z0-9_-]+):([A-Za-z0-9_-]+)@/, '***:***@'));
 
-  await mongoose.connect(uri);
+  try {
+    await mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
+      maxPoolSize: 10
+    });
+    console.log('Connected to database');
+  } catch (error) {
+    console.error('Failed to connect to database:', error.message || error);
+    process.exit(1);
+  }
 
   // Ensure a user exists to own seeded movies
   const bcrypt = require('bcrypt');
@@ -293,11 +305,18 @@ async function run() {
   const allGenres = await Movie.distinct('genres');
   console.log(`\nGenres available: ${allGenres.sort().join(', ')}`);
   
-  await mongoose.disconnect();
-  process.exit(0);
+  try {
+    await mongoose.disconnect();
+    console.log('Disconnected from database');
+    process.exit(0);
+  } catch (error) {
+    console.error('Error disconnecting:', error.message || error);
+    process.exit(1);
+  }
 }
 
 run().catch(e => { 
-  console.error('Seed failed:', e); 
+  console.error('Seed failed:', e.message || e);
+  mongoose.disconnect().catch(() => {});
   process.exit(1); 
 });

@@ -6,7 +6,15 @@ const Movie = require('./models/movie');
 const path = require('path');
 const session = require('express-session');
 const PORT = process.env.PORT || 8000;
-const CONNECTION_STRING = process.env.MONGODB_URI || `mongodb+srv://dbUser:dbUserPassword@cluster0.nyug8pi.mongodb.net/FinalProject`;
+const CONNECTION_STRING = process.env.MONGODB_URI;
+
+// Security: Require MONGODB_URI to be set via environment variable
+if (!CONNECTION_STRING) {
+    console.error('ERROR: MONGODB_URI environment variable is not set.');
+    console.error('Please set MONGODB_URI in your .env file or environment variables.');
+    console.error('Example: MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database');
+    // This allows the app to start but database operations will fail with clear errors
+}
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -69,21 +77,23 @@ const connectDB = async () => {
             return;
         }
 
-        if (!CONNECTION_STRING || CONNECTION_STRING.includes('dbUser:dbUserPassword')) {
-            console.warn('Warning: Using default MongoDB connection string. Set MONGODB_URI environment variable!');
+        if (!CONNECTION_STRING) {
+            console.error('ERROR: Cannot connect to database - MONGODB_URI is not set.');
+            console.error('Please set MONGODB_URI in your .env file or environment variables.');
+            return;
         }
 
         console.log(`Attempting to connect to DB...`);
         await mongoose.connect(CONNECTION_STRING, {
-            serverSelectionTimeoutMS: 10000, // Timeout after 10s
-            socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
-            maxPoolSize: 10, // Maintain up to 10 socket connections
+            serverSelectionTimeoutMS: 10000, 
+            socketTimeoutMS: 45000, 
+            maxPoolSize: 10, 
         });
         console.log(`Database connection established successfully.`);
         // testDB()
     } catch (error) {
         console.error(`Unable to connect to DB: ${error && error.message ? error.message : error}`);
-        // Don't throw - let routes handle it
+
         return;
     }
 };
@@ -93,14 +103,14 @@ const connectDB = async () => {
 app.use(async (req, res, next) => {
     try {
         const state = mongoose.connection.readyState;
-        // 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
+        
         if (state === 0) {
             console.log('Database not connected, attempting connection...');
             try {
                 await connectDB();
             } catch (dbError) {
                 console.error('Failed to connect to database:', dbError.message);
-                // Continue anyway - routes will handle DB errors
+                
             }
         } else if (state === 2) {
             // Already connecting, wait a bit (max 2 seconds)
@@ -118,23 +128,15 @@ app.use(async (req, res, next) => {
     next();
 });
 
-// Render homepage - show My Movies if logged in, otherwise show welcome page
-app.get('/', async (req, res) => {
-    // If user is logged in, show their movies (same as /movies/mine)
-    if (req.session && req.session.user) {
-        try {
-            const myId = req.session.user._id;
-            const movies = await Movie.find({ userId: myId }).sort({ _id: -1 });
-            return res.render('movies/mine', { movies });
-        } catch (e) {
-            console.error('Failed to load user movies', e && e.message ? e.message : e);
-            return res.render('movies/mine', { movies: [] });
-        }
-    }
-    
-    // If not logged in, show welcome page with Login/Register buttons
-    return res.render('index', { 
-        title: 'Welcome to MovieWatch'
+
+// Home route - always public, never requires authentication
+app.get('/', (req, res) => {
+    // Always show welcome page - no authentication required
+    // This route should never redirect to login
+    res.render('index', { 
+        title: 'Welcome to MovieWatch',
+        currentUser: req.session && req.session.user ? req.session.user : null,
+        hideAuthButtons: true
     });
 });
 
@@ -187,5 +189,5 @@ if (require.main === module) {
 }
 
 // Export for Vercel serverless
-// Updated: Ready for deployment
+
 module.exports = app;
