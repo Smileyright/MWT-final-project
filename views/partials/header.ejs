@@ -19,6 +19,7 @@
                     <li><a href="/">Home</a></li>
                     <li><a href="/movies">Movies</a></li>
                     <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+                        <li><a href="/movies/add">Add Movie</a></li>
                         <li><a href="/movies/mine">My Movies</a></li>
                         <li><a href="/logout">Logout</a></li>
                     <% } else { %>
