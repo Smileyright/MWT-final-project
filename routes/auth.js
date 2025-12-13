@@ -5,9 +5,8 @@ const User = require("../models/user");
 
 // Home route
 router.get("/home", (req, res) => {
-    console.log('HOME ROUTE HIT from auth routes');
-    res.render('index', { 
-        title: 'Welcome to MovieWatch',
+    res.render('home', { 
+        title: 'Home - MovieWatch',
         currentUser: req.session && req.session.user ? req.session.user : null
     });
 });
