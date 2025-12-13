@@ -28,6 +28,11 @@ router.get("/", async (req, res) => {
     res.render("movies/index", { movies, genres, currentUser: req.session && req.session.user ? req.session.user : null });
 });
 
+// Legacy route - redirect /mine to /mymovies
+router.get('/mine', (req, res) => {
+    return res.redirect('/movies/mymovies');
+});
+
 // My movies - list only movies created by the logged-in user
 router.get('/mymovies', async (req, res) => {
     if (!req.session || !req.session.user) return res.redirect('/login');
