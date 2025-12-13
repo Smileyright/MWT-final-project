@@ -82,9 +82,14 @@ router.get('/genre/:genre', async (req, res) => {
     return res.render('movies/genre', { movies, genres, selectedGenre: genre });
 });
 
-//Add
+//Add - must be before /:id route
 router.get("/add", (req, res) => {
-    if (!req.session || !req.session.user) return res.redirect("/login");
+    console.log('Add movie route hit');
+    console.log('Session user:', req.session && req.session.user ? 'exists' : 'missing');
+    if (!req.session || !req.session.user) {
+        console.log('Redirecting to login - no session');
+        return res.redirect("/login");
+    }
 
     res.render("movies/add", { errors: [], old: {} });
 });
