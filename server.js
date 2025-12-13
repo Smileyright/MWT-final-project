@@ -78,10 +78,9 @@ const testDB = async () => {
         const movieToInsert = Movie({
             _id: new mongoose.Types.ObjectId(),
             title: "Inception",
-            director: "Christopher Nolan",
+            description: "A mind-bending thriller about dreams within dreams",
             year: 2010,
-            genres: ["Sci-Fi", "Thriller"],
-            rating: 8.8
+            genres: ["Sci-Fi", "Thriller"]
         });
         console.log(movieToInsert);
         await movieToInsert.save();

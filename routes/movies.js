@@ -41,10 +41,39 @@ router.get('/mymovies', async (req, res) => {
 
         // Convert string ID to ObjectId for proper querying
         const myId = new mongoose.Types.ObjectId(req.session.user._id);
-        const movies = await Movie.find({ userId: myId }).sort({ _id: -1 });
+        const myIdString = req.session.user._id.toString();
+        console.log('Loading my movies for user ID (ObjectId):', myId);
+        console.log('Loading my movies for user ID (String):', myIdString);
+        console.log('Session user:', req.session.user);
+        
+        // Try querying with both ObjectId and string to catch any type mismatches
+        let movies = await Movie.find({ userId: myId }).sort({ _id: -1 });
+        
+        // If no movies found with ObjectId, try with string
+        if (movies.length === 0) {
+            console.log('No movies found with ObjectId, trying string match...');
+            movies = await Movie.find({ userId: myIdString }).sort({ _id: -1 });
+        }
+        
+        // Also try querying where userId matches as string
+        if (movies.length === 0) {
+            console.log('No movies found with string, trying any userId match...');
+            const allMovies = await Movie.find().sort({ _id: -1 });
+            console.log('All movies in DB:', allMovies.map(m => ({ 
+                title: m.title, 
+                userId: m.userId ? m.userId.toString() : 'null',
+                userIdType: typeof m.userId
+            })));
+            movies = allMovies.filter(m => m.userId && m.userId.toString() === myIdString);
+        }
+        
+        console.log('Found movies:', movies.length);
+        console.log('Movies:', movies.map(m => ({ title: m.title, userId: m.userId ? m.userId.toString() : 'null' })));
+        
         return res.render('movies/mymovies', { movies, currentUser: req.session.user });
     } catch (e) {
         console.error('Failed to load user movies', e && e.message ? e.message : e);
+        console.error('Error stack:', e.stack);
         return res.render('movies/mymovies', { movies: [], currentUser: req.session.user });
     }
 });
