@@ -187,4 +187,5 @@ if (require.main === module) {
 }
 
 // Export for Vercel serverless
+// Updated: Ready for deployment
 module.exports = app;
