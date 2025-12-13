@@ -25,7 +25,7 @@ router.get("/", async (req, res) => {
         movies = [];
     }
 
-    res.render("movies/index", { movies, genres });
+    res.render("movies/index", { movies, genres, currentUser: req.session && req.session.user ? req.session.user : null });
 });
 
 // My movies - list only movies created by the logged-in user
@@ -65,7 +65,7 @@ router.get('/genre/:genre', async (req, res) => {
         // Check database connection
         if (mongoose.connection.readyState !== 1) {
             console.error('Database not connected when loading movies by genre');
-            return res.render('movies/genre', { movies: [], genres: [], selectedGenre: genre, error: "Database connection issue. Please try again." });
+            return res.render('movies/genre', { movies: [], genres: [], selectedGenre: genre, error: "Database connection issue. Please try again.", currentUser: req.session && req.session.user ? req.session.user : null });
         }
 
         genres = await Movie.distinct('genres');
@@ -79,7 +79,7 @@ router.get('/genre/:genre', async (req, res) => {
         movies = [];
     }
 
-    return res.render('movies/genre', { movies, genres, selectedGenre: genre });
+    return res.render('movies/genre', { movies, genres, selectedGenre: genre, currentUser: req.session && req.session.user ? req.session.user : null });
 });
 
 //Add - must be before /:id route

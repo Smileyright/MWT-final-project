@@ -4,7 +4,7 @@
     <h2>Movies</h2>
 
     <% if (typeof genres !== 'undefined' && genres && genres.length > 0) { %>
-        <div class="genres-bar" style="margin:1rem 0;padding:0 1rem;">
+        <div class="genres-bar">
             <strong>Genres:</strong>
             <% genres.forEach(function(g){ %>
                 <a href="/movies/genre/<%= encodeURIComponent(g) %>" class="chip"><%= g %></a>
