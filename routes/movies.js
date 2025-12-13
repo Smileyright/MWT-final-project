@@ -103,6 +103,10 @@ router.post("/add", async (req, res) => {
             console.error('Database not connected when adding movie');
             return res.render("movies/add", { errors: ["Database connection issue. Please try again."], old: req.body });
         }
+        
+        console.log('POST /movies/add - Request body:', req.body);
+        console.log('POST /movies/add - Session user:', req.session.user);
+        
         const { title, description, year, genres } = req.body;
         const errors = [];
 
@@ -115,6 +119,7 @@ router.post("/add", async (req, res) => {
         if (!genres || !genres.trim()) errors.push("At least one genre is needed");
 
         if (errors.length > 0) {
+            console.log('Validation errors:', errors);
             return res.render("movies/add", { errors, old: req.body });
         }
 
@@ -127,7 +132,9 @@ router.post("/add", async (req, res) => {
         // Convert string ID to ObjectId for proper storage
         const userId = new mongoose.Types.ObjectId(req.session.user._id);
         
-        await Movie.create({
+        console.log('Creating movie with data:', { title: title.trim(), year: parseInt(year), genres: genreArray, userId });
+        
+        const newMovie = await Movie.create({
             title: title.trim(),
             description: description.trim(),
             year: parseInt(year),
@@ -135,11 +142,15 @@ router.post("/add", async (req, res) => {
             userId: userId
         });
 
+        console.log('Movie created successfully:', newMovie._id);
+
         // Redirect to My Movies page after adding
         res.redirect("/movies/mymovies");
     } catch (e) {
         console.error('Error adding movie:', e);
-        return res.render("movies/add", { errors: ["Unable to add movie. Please try again."], old: req.body });
+        console.error('Error stack:', e.stack);
+        const errorMessage = e.message || "Unable to add movie. Please try again.";
+        return res.render("movies/add", { errors: [errorMessage], old: req.body });
     }
 });
 
