@@ -1,15 +1,13 @@
 <%- include('partials/header', { title: 'MovieWatch' }) %>
 
 <main>
-    <div style="text-align:center;padding:4rem 0;">
-        <h1 style="font-size:3rem;margin-bottom:1rem;">MovieWatch</h1>
-        <p class="muted" style="margin-top:1rem;margin-bottom:2rem;font-size:1.2rem;">Your personal movie collection manager</p>
-        <% if (typeof currentUser !== 'undefined' && currentUser) { %>
-            <div style="margin-top:3rem;">
-                <a href="/movies"><button style="margin:0 1rem; padding:0.75rem 2rem; font-size:1.1rem;">Browse Movies</button></a>
-                <a href="/movies/mymovies"><button style="margin:0 1rem; padding:0.75rem 2rem; font-size:1.1rem;">My Movies</button></a>
-            </div>
-        <% } %>
+    <div style="text-align:center;padding:6rem 0;">
+        <h1 style="font-size:4rem;margin-bottom:1.5rem;color:#6366f1;font-weight:700;">MovieWatch</h1>
+        <p class="muted" style="margin-top:1rem;margin-bottom:3rem;font-size:1.3rem;">Your personal movie collection manager</p>
+        <p style="font-size:1.1rem;color:#64748b;max-width:600px;margin:0 auto 3rem;">Discover, organize, and manage your favorite movies all in one place.</p>
+        <div style="margin-top:4rem;">
+            <a href="/movies"><button style="margin:0 1rem; padding:1rem 2.5rem; font-size:1.2rem;background:#6366f1;color:white;border:none;border-radius:0.5rem;cursor:pointer;">Explore Movies</button></a>
+        </div>
     </div>
 </main>
 
