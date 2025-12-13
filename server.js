@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const Movie = require('./models/movie');
 const path = require('path');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const PORT = process.env.PORT || 8000;
 const CONNECTION_STRING = process.env.MONGODB_URI;
 
@@ -23,8 +24,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Session middleware (required for auth routes that use `req.session`)
-// For Vercel/serverless, use memory store (default)
-app.use(session({
+// For Vercel/serverless, use MongoDB store to persist sessions across function invocations
+const sessionConfig = {
     name: 'moviewatch.sid',
     secret: process.env.SESSION_SECRET || 'change_this_secret',
     resave: false,
@@ -35,7 +36,20 @@ app.use(session({
         maxAge: 24 * 60 * 60 * 1000, // 24 hours
         sameSite: 'lax'
     }
-}));
+};
+
+// Use MongoDB store if connection string is available, otherwise fall back to memory store
+if (CONNECTION_STRING) {
+    sessionConfig.store = MongoStore.create({
+        mongoUrl: CONNECTION_STRING,
+        touchAfter: 24 * 3600, // lazy session update (24 hours)
+        ttl: 24 * 60 * 60, // 24 hours
+    });
+} else {
+    console.warn('WARNING: MONGODB_URI not set. Sessions will use memory store (not persistent).');
+}
+
+app.use(session(sessionConfig));
 
 // Expose current user to views (must be after session middleware)
 app.use((req, res, next) => {
